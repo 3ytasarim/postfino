@@ -142,9 +142,9 @@ function MiniInbox() {
 
 export function Features() {
   return (
-    <section id="funktionen" className="relative px-4 py-24 sm:py-32">
+    <section id="funktionen" className="relative px-4 py-14 sm:py-20">
       <SectionHead eyebrow="Funktionen" title={<>Alles, was dein Social-Media-Alltag braucht.</>} lead="Von der ersten Idee bis zur Auswertung – in einer ruhigen, übersichtlichen Oberfläche statt in zehn Browser-Tabs." />
-      <div className="mx-auto mt-16 grid max-w-6xl gap-4 md:grid-cols-6">
+      <div className="mx-auto mt-10 grid max-w-6xl gap-4 md:grid-cols-6">
         <Card className="md:col-span-4" icon={<CalendarClock className="size-5" />} title="Planen & Veröffentlichen" text="Kalender mit Wochen- und Monatsansicht, Warteschlange und Drag & Drop. Ein Beitrag, mehrere Kanäle – mit Anpassungen pro Netzwerk.">
           <MiniCalendar />
         </Card>

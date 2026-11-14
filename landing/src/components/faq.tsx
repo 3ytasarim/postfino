@@ -9,9 +9,9 @@ import { FAQ } from "@/lib/faq";
 export function Faq() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section id="faq" className="relative px-4 py-24 sm:py-32">
+    <section id="faq" className="relative px-4 py-14 sm:py-20">
       <SectionHead eyebrow="FAQ" title="Häufige Fragen" />
-      <Reveal className="mx-auto mt-12 max-w-3xl">
+      <Reveal className="mx-auto mt-8 max-w-3xl">
         <ul className="space-y-3">
           {FAQ.map(([q, a], i) => {
             const isOpen = open === i;

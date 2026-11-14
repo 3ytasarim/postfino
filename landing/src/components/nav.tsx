@@ -28,10 +28,10 @@ export function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3">
       <motion.nav
-        initial={{ y: -40, opacity: 0 }}
+        initial={{ y: -40, opacity: 0, width: "min(1180px, 100%)" }}
         animate={{ y: 0, opacity: 1, width: scrolled ? "min(980px, 100%)" : "min(1180px, 100%)" }}
         transition={{ type: "spring", stiffness: 260, damping: 30 }}
-        className={`flex items-center justify-between gap-3 rounded-full px-3 py-2 transition-colors duration-300 ${scrolled ? "glass" : "bg-transparent"}`}
+        className={`flex items-center justify-between gap-3 rounded-full px-3 py-2 transition-colors duration-300 ${scrolled ? "glass" : "border border-transparent bg-transparent"}`}
         aria-label="Hauptnavigation"
       >
         <a href="#top" className="px-2 py-1" aria-label="Postfino – Startseite">

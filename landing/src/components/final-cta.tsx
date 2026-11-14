@@ -1,18 +1,17 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Reveal } from "./reveal";
+import { CtaShader } from "./cta-shader";
 import { COMPANY, REGISTER_URL } from "@/lib/site";
 
 export function FinalCta() {
   return (
-    <section className="px-4 pb-24">
+    <section className="px-4 pt-4 pb-16">
       <Reveal className="mx-auto max-w-6xl">
         <div className="relative overflow-hidden rounded-[36px] bg-[#070d24] px-6 py-12 text-white sm:px-12 md:py-14">
-          <div className="aurora" aria-hidden>
-            <i />
-            <i />
-            <i />
-          </div>
+          <CtaShader />
+          {/* keeps the copy readable over the bright lines */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_75%_at_24%_50%,rgba(7,13,36,0.55),rgba(7,13,36,0.08)_75%,transparent)]" />
           <div className="relative grid items-center gap-10 md:grid-cols-[1.3fr_1fr]">
             <div className="text-center md:text-left">
               <h2 className="font-display text-[clamp(1.9rem,3.6vw,3rem)] leading-[1.05] font-bold tracking-[-0.03em]">Bleib sichtbar – ohne jeden Tag daran zu denken.</h2>

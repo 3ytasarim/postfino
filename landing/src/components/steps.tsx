@@ -16,7 +16,7 @@ export function Steps() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 75%", "end 55%"] });
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
   return (
-    <section id="so-gehts" className="relative overflow-hidden bg-[#070d24] px-4 py-24 text-white sm:py-32">
+    <section id="so-gehts" className="relative overflow-hidden bg-[#070d24] px-4 py-14 text-white sm:py-20">
       <div className="aurora" aria-hidden>
         <i />
         <i />
@@ -24,7 +24,7 @@ export function Steps() {
       </div>
       <div className="relative">
         <SectionHead light eyebrow="So geht's" title="In drei Schritten startklar." lead="Keine Installation, keine Kreditkarte für die Registrierung. Du brauchst nur deine E-Mail-Adresse und Zugang zu deinen Kanälen." />
-        <div ref={ref} className="relative mx-auto mt-16 max-w-6xl">
+        <div ref={ref} className="relative mx-auto mt-10 max-w-6xl">
           <div className="absolute top-[34px] right-[16%] left-[16%] hidden h-px bg-white/15 md:block" aria-hidden>
             <motion.div style={{ scaleX }} className="h-full origin-left bg-gradient-to-r from-sky to-lilac" />
           </div>

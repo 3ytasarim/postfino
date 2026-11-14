@@ -12,9 +12,9 @@ const ITEMS = [
 
 export function Trust() {
   return (
-    <section className="relative px-4 py-24 sm:py-32" aria-labelledby="trust-title">
+    <section className="relative px-4 py-14 sm:py-20" aria-labelledby="trust-title">
       <SectionHead eyebrow="Sicherheit" title={<span id="trust-title">Deine Kanäle sind bei uns gut aufgehoben.</span>} />
-      <ul className="mx-auto mt-14 grid max-w-6xl gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mx-auto mt-10 grid max-w-6xl gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
         {ITEMS.map(({ icon: I, title, text }, i) => (
           <Reveal as="li" key={title} delay={(i % 3) * 0.08} className="flex gap-4">
               <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white text-cobalt-2 shadow-sm ring-1 ring-line">

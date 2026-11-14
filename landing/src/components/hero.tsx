@@ -60,7 +60,7 @@ export function Hero() {
   }, [mx, my]);
 
   return (
-    <section id="top" className="relative overflow-hidden pt-32 pb-20 sm:pt-40">
+    <section id="top" className="relative overflow-hidden pt-32 pb-10 sm:pt-40">
       <div className="aurora soft" aria-hidden>
         <i />
         <i />

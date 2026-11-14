@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
-import { motion } from "motion/react";
-import { CalendarDays, Check, CheckCircle2, ChevronLeft, ChevronRight, Filter, Lightbulb, MessagesSquare, MousePointer2, Reply } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { AnimatePresence, LayoutGroup, motion } from "motion/react";
+import { BarChart3, CalendarDays, Check, Lock, Settings, CheckCircle2, ChevronLeft, ChevronRight, Filter, Lightbulb, MessagesSquare, MousePointer2, Reply } from "lucide-react";
 import { SectionHead, Reveal } from "./reveal";
 import { NetworkIcon, networkColor } from "./network-icon";
 
@@ -130,62 +130,212 @@ function CalendarView() {
   );
 }
 
-function IdeasView() {
-  const cols = [
-    ["Ideen", ["Kundenstimme als Karussell", "Team-Vorstellung", "FAQ-Reel"]],
-    ["In Arbeit", ["Sommer-Aktion", "Blogartikel teasern"]],
-    ["Bereit", ["Produkt-Launch"]],
-  ] as const;
+/** Milliseconds into a repeating `period` while `on`; resets when the tab is left. Reduced motion → final frame. */
+function useLoop(on: boolean, period: number) {
+  const [t, setT] = useState(0);
+  useEffect(() => {
+    if (!on) {
+      setT(0);
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setT(period - 1);
+      return;
+    }
+    const start = performance.now();
+    const id = window.setInterval(() => {
+      if (!document.hidden) setT((performance.now() - start) % period);
+    }, 80);
+    return () => window.clearInterval(id);
+  }, [on, period]);
+  return t;
+}
+
+type Idea = { id: string; title: string; tag: string; tone: string; who: string; thumb?: string };
+const IDEAS: Record<string, Idea> = {
+  kunde: { id: "kunde", title: "Kundenstimme als Karussell", tag: "Social Proof", tone: "bg-sky/15 text-cobalt-2", who: "LK", thumb: "from-sky/50 to-lilac/50" },
+  team: { id: "team", title: "Team-Vorstellung", tag: "Employer", tone: "bg-lilac/15 text-lilac", who: "MB" },
+  faq: { id: "faq", title: "FAQ-Reel", tag: "Reel", tone: "bg-[#ff4d8d]/12 text-[#d6336c]", who: "AS", thumb: "from-[#ff8a65]/60 to-[#ff4d8d]/50" },
+  sommer: { id: "sommer", title: "Sommer-Aktion", tag: "Kampagne", tone: "bg-mint/15 text-[#0f8f72]", who: "LK", thumb: "from-mint/50 to-sky/40" },
+  blog: { id: "blog", title: "Blogartikel teasern", tag: "Content", tone: "bg-sky/15 text-cobalt-2", who: "MB" },
+  launch: { id: "launch", title: "Produkt-Launch", tag: "Launch", tone: "bg-cobalt/10 text-cobalt", who: "AS", thumb: "from-cobalt/50 to-sky/50" },
+  umfrage: { id: "umfrage", title: "Umfrage: Lieblingsfarbe?", tag: "Story", tone: "bg-lilac/15 text-lilac", who: "LK" },
+};
+const IDEA_STEP = 2000;
+
+function IdeaCard({ it, moving, approved, fresh }: { it: Idea; moving: boolean; approved: boolean; fresh: boolean }) {
   return (
-    <div className="grid grid-cols-3 gap-3">
-      {cols.map(([name, items], ci) => (
-        <div key={name} className="rounded-2xl bg-paper/80 p-2.5 ring-1 ring-line">
-          <p className="mb-2 px-1 text-xs font-bold text-ink-3">
-            {name} <span className="font-medium">· {items.length}</span>
-          </p>
-          {items.map((it, i) => (
-            <motion.div key={it} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + ci * 0.1 + i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="mb-2 rounded-xl bg-white p-2.5 text-sm font-medium shadow-sm ring-1 ring-line">
-              {it}
-              {ci === 2 && (
-                <span className="mt-1.5 flex items-center gap-1 text-xs font-semibold text-mint">
-                  <CheckCircle2 className="size-3.5" /> Freigegeben
-                </span>
-              )}
-            </motion.div>
+    <motion.div
+      layout
+      layoutId={`idea-${it.id}`}
+      initial={fresh ? { opacity: 0, scale: 0.85, y: -10 } : false}
+      animate={{ opacity: 1, scale: moving ? 1.04 : 1, rotate: moving ? -2 : 0, y: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 26 }}
+      className={`relative mb-2 rounded-xl bg-white p-2.5 ${moving ? "z-10 shadow-[0_18px_36px_-12px_rgba(16,40,110,0.5)] ring-2 ring-sky" : fresh ? "shadow-sm ring-2 ring-mint/60" : "shadow-sm ring-1 ring-line"}`}
+    >
+      {it.thumb && <span className={`mb-2 block h-10 rounded-lg bg-gradient-to-br ${it.thumb}`} />}
+      <span className="block text-[0.8rem] leading-snug font-semibold">{it.title}</span>
+      <span className="mt-2 flex items-center gap-1.5">
+        <span className={`rounded-full px-1.5 py-0.5 text-[0.6rem] font-bold ${it.tone}`}>{it.tag}</span>
+        {fresh && <span className="rounded-full bg-mint px-1.5 py-0.5 text-[0.6rem] font-bold text-white">Neu</span>}
+        <span className="ml-auto grid size-5 place-items-center rounded-full bg-ink text-[0.55rem] font-bold text-white">{it.who}</span>
+      </span>
+      {approved && (
+        <motion.span initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="mt-2 flex items-center gap-1 text-[0.68rem] font-semibold text-mint">
+          <CheckCircle2 className="size-3.5" /> Freigegeben
+        </motion.span>
+      )}
+      {moving && <MousePointer2 className="absolute -right-2 -bottom-3 size-5 fill-ink text-white drop-shadow" />}
+    </motion.div>
+  );
+}
+
+function IdeasView({ on }: { on: boolean }) {
+  const t = useLoop(on, IDEA_STEP * 4);
+  const s = Math.floor(t / IDEA_STEP); // 0 rest · 1 FAQ → In Arbeit · 2 FAQ → Bereit · 3 new idea
+  const cols: [string, string[]][] = [
+    ["Ideen", [...(s === 3 ? ["umfrage"] : []), "kunde", "team", ...(s === 0 ? ["faq"] : [])]],
+    ["In Arbeit", [...(s === 1 ? ["faq"] : []), "sommer", "blog"]],
+    ["Bereit", [...(s >= 2 ? ["faq"] : []), "launch"]],
+  ];
+  return (
+    <div className="flex h-full flex-col rounded-2xl bg-white p-3 shadow-sm ring-1 ring-line">
+      <div className="flex items-center gap-2 pb-3">
+        <span className="font-display text-sm font-bold">Ideen-Board</span>
+        <span className="rounded-full bg-paper px-2 py-0.5 text-[0.65rem] font-semibold text-ink-3 ring-1 ring-line">Herbst-Kampagne</span>
+        <span className="ml-auto flex -space-x-1.5">
+          {["LK", "MB", "AS"].map((w, i) => (
+            <span key={w} className={`grid size-6 place-items-center rounded-full text-[0.55rem] font-bold text-white ring-2 ring-white ${["bg-cobalt", "bg-lilac", "bg-mint"][i]}`}>
+              {w}
+            </span>
+          ))}
+        </span>
+        <span className="rounded-full bg-cobalt px-3 py-1 text-[0.7rem] font-semibold text-white">+ Idee</span>
+      </div>
+      <LayoutGroup>
+        <div className="grid flex-1 grid-cols-3 gap-2.5">
+          {cols.map(([name, ids], ci) => (
+            <div key={name} className={`flex flex-col rounded-2xl p-2 ring-1 transition-colors duration-500 ${(s === 1 && ci === 1) || (s === 2 && ci === 2) ? "bg-sky/10 ring-sky/40" : "bg-paper/80 ring-line"}`}>
+              <p className="mb-2 flex items-center gap-1.5 px-1 text-xs font-bold text-ink-3">
+                <span className={`size-2 rounded-full ${["bg-lilac", "bg-sky", "bg-mint"][ci]}`} />
+                {name}
+                <motion.span key={ids.length} initial={{ scale: 1.5 }} animate={{ scale: 1 }} className="font-medium">
+                  · {ids.length}
+                </motion.span>
+              </p>
+              {ids.map((id) => (
+                <IdeaCard key={id} it={IDEAS[id]} moving={id === "faq" && (s === 1 || s === 2)} approved={ci === 2} fresh={id === "umfrage"} />
+              ))}
+            </div>
           ))}
         </div>
-      ))}
+      </LayoutGroup>
     </div>
   );
 }
 
-function CommunityView() {
-  const msgs = [
-    ["instagram_business", "@lea.k", "Gibt es das auch in Blau?", true],
-    ["facebook_page", "Markus B.", "Super Beratung heute, danke!", false],
-    ["youtube", "@techfan", "Kommt noch ein Teil 3?", false],
-  ] as const;
+const INBOX = [
+  { p: "instagram_business", who: "@lea.k", text: "Gibt es das auch in Blau?" },
+  { p: "facebook_page", who: "Markus B.", text: "Super Beratung heute, danke!", done: true },
+  { p: "youtube", who: "@techfan", text: "Kommt noch ein Teil 3?" },
+  { p: "tiktok", who: "@mia.sun", text: "Welcher Song ist das? 😍", done: true },
+];
+const REPLY = "Ja! Ab Montag wieder im Laden 💙";
+const COMM_PERIOD = 8000;
+
+function CommunityView({ on }: { on: boolean }) {
+  const t = useLoop(on, COMM_PERIOD);
+  const arrived = t > 500;
+  const opened = t > 1300;
+  const typing = t > 2300 && t < 3900;
+  const typed = REPLY.slice(0, Math.max(0, Math.min(REPLY.length, Math.floor(((t - 2300) / 1400) * REPLY.length))));
+  const sent = t > 3900;
+  const done = t > 4700;
+  const list = arrived ? INBOX : INBOX.slice(1);
+  const open = list.filter((m) => !m.done && !(m.who === "@lea.k" && done)).length;
   return (
-    <div className="grid gap-3 sm:grid-cols-[1fr_1.1fr]">
-      <ul className="space-y-2">
-        {msgs.map(([p, who, t, active], i) => (
-          <motion.li key={who} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.08 }} className={`flex items-start gap-2.5 rounded-2xl p-3 ring-1 ${active ? "bg-white ring-sky" : "bg-paper/80 ring-line"}`}>
-            <NetworkIcon platform={p} badge size={24} />
-            <span className="min-w-0">
-              <span className="block text-xs font-bold">{who}</span>
-              <span className="block truncate text-sm text-ink-2">{t}</span>
-            </span>
-          </motion.li>
-        ))}
-      </ul>
-      <div className="flex flex-col rounded-2xl bg-white p-4 ring-1 ring-line">
-        <p className="text-xs font-bold text-ink-3">@lea.k auf Instagram</p>
-        <p className="mt-2 w-fit rounded-2xl rounded-tl-sm bg-paper px-3 py-2 text-sm">Gibt es das auch in Blau?</p>
-        <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="mt-2 ml-auto w-fit rounded-2xl rounded-tr-sm bg-cobalt px-3 py-2 text-sm text-white">
-          Ja! Ab Montag wieder im Laden 💙
-        </motion.p>
-        <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-xs font-semibold text-cobalt-2">
-          <Reply className="size-3.5" /> Antwort direkt aus Postfino
+    <div className="grid h-full grid-cols-[1fr_1.15fr] gap-3">
+      <div className="flex flex-col overflow-hidden rounded-2xl bg-white p-3 shadow-sm ring-1 ring-line">
+        <div className="mb-3 flex items-center gap-1 rounded-lg bg-paper p-0.5 text-[0.68rem] font-semibold ring-1 ring-line">
+          <span className="rounded-md bg-white px-2 py-1 shadow-sm">Alle · {list.length}</span>
+          <span className="px-2 py-1 text-ink-3">
+            Offen ·{" "}
+            <motion.span key={open} initial={{ scale: 1.6, color: "#0047ab" }} animate={{ scale: 1, color: "#6b7280" }} className="inline-block">
+              {open}
+            </motion.span>
+          </span>
+          <span className="px-2 py-1 text-ink-3">Erledigt</span>
+        </div>
+        <ul className="relative -mx-1.5 flex-1 space-y-2 overflow-hidden px-1.5 py-1">
+          <AnimatePresence initial={false} mode="popLayout">
+            {list.map((m) => {
+              const active = m.who === "@lea.k" && opened;
+              const isDone = m.done || (m.who === "@lea.k" && done);
+              return (
+                <motion.li
+                  layout
+                  key={m.who}
+                  initial={{ opacity: 0, y: -28, scale: 0.92 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 340, damping: 28 }}
+                  className={`flex items-start gap-2.5 rounded-xl p-2.5 transition-colors duration-300 ${active ? "bg-white shadow-[0_10px_24px_-14px_rgba(16,40,110,0.55)] ring-2 ring-sky" : "bg-paper/80 ring-1 ring-line"}`}
+                >
+                  <NetworkIcon platform={m.p} badge size={22} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[0.7rem] font-bold">{m.who}</span>
+                    <span className="block truncate text-[0.75rem] text-ink-2">{m.text}</span>
+                  </span>
+                  {isDone ? <CheckCircle2 className="size-4 shrink-0 text-mint" /> : <span className="mt-1 size-2 shrink-0 rounded-full bg-sky" />}
+                </motion.li>
+              );
+            })}
+          </AnimatePresence>
+        </ul>
+      </div>
+
+      <div className="flex flex-col rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-line">
+        <div className="flex items-center gap-2 border-b border-line pb-2.5">
+          <NetworkIcon platform="instagram_business" badge size={22} />
+          <span className="text-[0.75rem] font-bold">@lea.k</span>
+          <span className="text-[0.68rem] text-ink-3">auf Instagram</span>
+          <span className={`ml-auto inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.62rem] font-bold transition-colors duration-500 ${done ? "bg-mint/15 text-[#0f8f72]" : "bg-sky/15 text-cobalt-2"}`}>
+            {done && <Check className="size-3" strokeWidth={3} />}
+            {done ? "Beantwortet" : "Offen"}
+          </span>
+        </div>
+        <div className="flex flex-1 flex-col gap-2 py-3">
+          <AnimatePresence>
+            {opened && (
+              <motion.p key="in" initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="w-fit rounded-2xl rounded-tl-sm bg-paper px-3 py-2 text-[0.8rem]">
+                Gibt es das auch in Blau?
+              </motion.p>
+            )}
+            {typing && (
+              <motion.span key="dots" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="ml-auto flex w-fit gap-1 rounded-2xl rounded-tr-sm bg-cobalt/10 px-3 py-2.5">
+                {[0, 1, 2].map((i) => (
+                  <motion.span key={i} className="size-1.5 rounded-full bg-cobalt" animate={{ y: [0, -3, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.12 }} />
+                ))}
+              </motion.span>
+            )}
+            {sent && (
+              <motion.p key="out" initial={{ opacity: 0, y: 10, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }} transition={{ type: "spring", stiffness: 380, damping: 24 }} className="ml-auto w-fit rounded-2xl rounded-tr-sm bg-cobalt px-3 py-2 text-[0.8rem] text-white">
+                {REPLY}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+        <div className="flex items-center gap-2 rounded-full bg-paper py-1.5 pr-1.5 pl-3 ring-1 ring-line">
+          <span className="min-w-0 flex-1 truncate text-[0.75rem] text-ink-2">
+            {typing ? typed : <span className="text-ink-3">Antwort schreiben…</span>}
+            {typing && <span className="ml-px inline-block h-3.5 w-px translate-y-0.5 animate-pulse bg-ink" />}
+          </span>
+          <motion.span animate={{ scale: typing && typed.length === REPLY.length ? [1, 1.15, 1] : 1 }} className="grid size-7 place-items-center rounded-full bg-cobalt text-white">
+            <Reply className="size-3.5" />
+          </motion.span>
+        </div>
+        <span className="mt-2 inline-flex items-center gap-1.5 text-[0.68rem] font-semibold text-cobalt-2">
+          <Reply className="size-3" /> Antwort direkt aus Postfino
         </span>
       </div>
     </div>
@@ -193,6 +343,42 @@ function CommunityView() {
 }
 
 const ROTATE_MS = 8000;
+
+/** Below `min` px the mockup keeps its desktop layout and is scaled down as a whole, like a screenshot. */
+function FitScale({ min, children }: { min: number; children: ReactNode }) {
+  const box = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  const [fit, setFit] = useState({ s: 1, h: 0 });
+  useLayoutEffect(() => {
+    const el = box.current, inn = inner.current;
+    if (!el || !inn) return;
+    const measure = () => {
+      const s = Math.min(1, el.clientWidth / min);
+      setFit((p) => (p.s === s && p.h === inn.offsetHeight ? p : { s, h: inn.offsetHeight }));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    ro.observe(inn);
+    return () => ro.disconnect();
+  }, [min]);
+  const scaled = fit.s < 1;
+  return (
+    <div ref={box} className="relative min-w-0" style={scaled ? { height: fit.h * fit.s } : undefined}>
+      <div ref={inner} style={scaled ? { position: "absolute", left: 0, top: 0, width: min, transform: `scale(${fit.s})`, transformOrigin: "top left" } : undefined}>
+        {children}
+      </div>
+    </div>
+  );
+}
+const URL_PATH: Record<Tab, string> = { kalender: "calendar", ideen: "ideas", community: "community" };
+const RAIL: { id: string; icon: typeof CalendarDays }[] = [
+  { id: "kalender", icon: CalendarDays },
+  { id: "ideen", icon: Lightbulb },
+  { id: "community", icon: MessagesSquare },
+  { id: "insights", icon: BarChart3 },
+  { id: "settings", icon: Settings },
+];
 const POINTS: Record<Tab, string[]> = {
   kalender: ["Woche, Monat oder Liste", "Drag & Drop zum Umplanen", "Filter nach Kanal, Status & Tags", "Zeitzone frei wählbar"],
   ideen: ["Spalten: Ideen, In Arbeit, Bereit", "Ideen mit Notizen & Medien", "Ein Klick: Idee → Entwurf", "Gemeinsam im Team"],
@@ -203,6 +389,9 @@ export function Showcase() {
   const [tab, setTab] = useState<Tab>("kalender");
   const [paused, setPaused] = useState(false);
   const cur = TABS.find((t) => t.id === tab)!;
+  // highlight walks through the bullet points of the open tab
+  const pt = useLoop(true, 4 * 1800);
+  const ptIdx = Math.floor(pt / 1800);
   useEffect(() => {
     if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = window.setTimeout(() => {
@@ -212,9 +401,9 @@ export function Showcase() {
     return () => window.clearTimeout(id);
   }, [tab, paused]);
   return (
-    <section className="relative px-4 py-24 sm:py-32" aria-labelledby="showcase">
+    <section className="relative px-4 py-14 sm:py-20" aria-labelledby="showcase">
       <SectionHead eyebrow="Einblick" title={<span id="showcase">Gebaut für den Arbeitsalltag.</span>} />
-      <Reveal className="mx-auto mt-10 flex justify-center">
+      <Reveal className="mx-auto mt-8 flex justify-center">
         <div role="tablist" aria-label="Bereiche der Anwendung" className="glass inline-flex rounded-full p-1.5">
           {TABS.map(({ id, label, icon: I }) => (
             <button key={id} role="tab" aria-selected={tab === id} aria-controls="showcase-panel" onClick={() => setTab(id)} className={`relative flex min-h-11 items-center gap-2 overflow-hidden rounded-full px-4 text-sm font-semibold transition-colors sm:px-5 ${tab === id ? "text-white" : "text-ink-2 hover:text-ink"}`}>
@@ -242,31 +431,70 @@ export function Showcase() {
                   </span>
                   <h3 className="mt-5 font-display text-2xl font-bold tracking-tight">{tb.title}</h3>
                   <p className="mt-3 leading-relaxed text-ink-2">{tb.text}</p>
-                  <ul className="mt-5 space-y-2.5">
-                    {POINTS[tb.id].map((pt, i) => (
-                      <motion.li key={pt} initial={false} animate={on ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} transition={{ delay: on ? 0.2 + i * 0.07 : 0 }} className="flex items-center gap-2.5 text-sm font-medium">
-                        <span className="grid size-5 shrink-0 place-items-center rounded-full bg-mint/15 text-mint">
-                          <Check className="size-3" strokeWidth={3} />
-                        </span>
-                        {pt}
-                      </motion.li>
-                    ))}
+                  <ul className="-mx-2 mt-4 space-y-1">
+                    {POINTS[tb.id].map((label, i) => {
+                      const lit = on && i === ptIdx;
+                      return (
+                        <motion.li key={label} initial={false} animate={on ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} transition={{ delay: on ? 0.2 + i * 0.07 : 0 }} className={`relative flex items-center gap-2.5 rounded-xl px-2 py-1.5 text-sm font-medium transition-colors duration-300 ${lit ? "text-ink" : "text-ink-2"}`}>
+                          {lit && <motion.span layoutId={`pt-${tb.id}`} className="absolute inset-0 rounded-xl bg-white shadow-[0_8px_20px_-12px_rgba(0,71,171,0.45)] ring-1 ring-cobalt/10" transition={{ type: "spring", stiffness: 380, damping: 32 }} />}
+                          <motion.span className={`relative grid size-5 shrink-0 place-items-center rounded-full transition-colors duration-300 ${lit ? "bg-mint text-white" : "bg-mint/15 text-mint"}`} animate={{ scale: lit ? [1, 1.25, 1] : 1 }} transition={{ duration: 0.45 }}>
+                            <Check className="size-3" strokeWidth={3} />
+                          </motion.span>
+                          <span className="relative">{label}</span>
+                        </motion.li>
+                      );
+                    })}
                   </ul>
                 </motion.div>
               );
             })}
           </div>
-          <div className="overflow-x-auto rounded-[24px] bg-gradient-to-br from-[#eef3ff] via-white to-[#f3efff] p-3 sm:p-4">
-            <div className="grid min-w-[560px]">
-              {TABS.map((tb) => {
-                const on = tb.id === tab;
-                return (
-                  <motion.div key={tb.id} aria-hidden={!on} className={`[grid-area:1/1] ${on ? "" : "pointer-events-none"}`} initial={false} animate={on ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 12, scale: 0.98 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: on ? 0.12 : 0 }}>
-                    {tb.id === "kalender" ? <CalendarView key={on ? "on" : "off"} /> : tb.id === "ideen" ? <IdeasView /> : <CommunityView />}
-                  </motion.div>
-                );
-              })}
-            </div>
+          <div className="rounded-[24px] bg-gradient-to-br from-[#eef3ff] via-white to-[#f3efff] p-2.5 sm:p-3">
+            {/* app window mockup: title bar with address, icon rail, the live view */}
+            <FitScale min={640}>
+              <div className="overflow-hidden rounded-[18px] bg-[#f4f7fd] shadow-[0_24px_60px_-28px_rgba(16,40,110,0.45)] ring-1 ring-line">
+                <div className="flex items-center gap-3 border-b border-line bg-white px-4 py-2.5">
+                  <span className="flex gap-1.5" aria-hidden>
+                    <span className="size-2.5 rounded-full bg-[#ff5f57]" />
+                    <span className="size-2.5 rounded-full bg-[#febc2e]" />
+                    <span className="size-2.5 rounded-full bg-[#28c840]" />
+                  </span>
+                  <span className="mx-auto flex w-[min(320px,60%)] items-center justify-center gap-1.5 rounded-lg bg-paper px-3 py-1 text-[0.68rem] font-medium text-ink-3 ring-1 ring-line">
+                    <Lock className="size-3" />
+                    app.postfino.com/app/
+                    <span className="relative inline-block h-4 w-[4.6rem] overflow-hidden text-left">
+                      <AnimatePresence initial={false} mode="popLayout">
+                        <motion.span key={tab} className="absolute inset-0 font-semibold text-ink" initial={{ y: 14, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -14, opacity: 0 }} transition={{ type: "spring", stiffness: 380, damping: 30 }}>
+                          {URL_PATH[tab]}
+                        </motion.span>
+                      </AnimatePresence>
+                    </span>
+                  </span>
+                  <span className="grid size-6 place-items-center rounded-full bg-cobalt text-[0.55rem] font-bold text-white">LK</span>
+                </div>
+                <div className="flex">
+                  <nav aria-hidden className="flex w-12 shrink-0 flex-col items-center gap-1.5 border-r border-line bg-white py-3">
+                    <span className="mb-2 grid size-7 place-items-center rounded-lg bg-cobalt text-[0.7rem] font-extrabold text-white">P</span>
+                    {RAIL.map(({ id, icon: I }) => (
+                      <span key={id} className={`relative grid size-8 place-items-center rounded-lg ${id === tab ? "text-cobalt" : "text-ink-3"}`}>
+                        {id === tab && <motion.span layoutId="rail-pill" className="absolute inset-0 rounded-lg bg-cobalt/10 ring-1 ring-cobalt/20" transition={{ type: "spring", stiffness: 380, damping: 32 }} />}
+                        <I className="relative size-4" />
+                      </span>
+                    ))}
+                  </nav>
+                  <div className="grid flex-1 p-3">
+                    {TABS.map((tb) => {
+                      const on = tb.id === tab;
+                      return (
+                        <motion.div key={tb.id} aria-hidden={!on} className={`[grid-area:1/1] ${on ? "" : "pointer-events-none"}`} initial={false} animate={on ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 12, scale: 0.98 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: on ? 0.12 : 0 }}>
+                          {tb.id === "kalender" ? <CalendarView key={on ? "on" : "off"} /> : tb.id === "ideen" ? <IdeasView on={on} /> : <CommunityView on={on} />}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </FitScale>
           </div>
         </div>
       </Reveal>
