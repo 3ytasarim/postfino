@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - embedded-postgres
+  - ffmpeg-static
+  - "@embedded-postgres/windows-x64"
+  - "@tailwindcss/oxide"

@@ -1,0 +1,463 @@
+@import "tailwindcss";
+
+/* SichtTakt design tokens — warm paper / deep ink with a single "Takt" signal accent.
+   8px grid, fluid type, light + dark. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --color-bg: var(--bg);
+  --color-shell: var(--shell);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-takt: var(--takt);
+  --color-takt-ink: var(--takt-ink);
+  --color-takt-soft: var(--takt-soft);
+  --color-puls: var(--puls);
+  --color-puls-soft: var(--puls-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-chart-1: var(--chart-1);
+
+  --radius-card: 22px;
+  --radius-ctl: 12px;
+  --ease-takt: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  --bg: #e9e9e6;
+  --shell: #f5f5f3;
+  --rail: #0e0f12;
+  --glass: rgba(255, 255, 255, 0.52);
+  --glass-line: rgba(255, 255, 255, 0.75);
+  --glass-shadow: 0 24px 60px -20px rgba(30, 40, 90, 0.25);
+  --aurora-base: #e9edf7;
+  --a1: #7ea6ff; --a2: #b7a6ff; --a3: #79e0d6; --a4: #ffc2dc;
+  --lilac: #7c6cf0;
+  --surface: #ffffff;
+  --surface-2: #f1f1ee;
+  --line: #e6e5e0;
+  --ink: #111318;
+  --ink-2: #4a4d55;
+  --ink-3: #6b6e76;
+  --takt: #0047ab;
+  --takt-ink: #ffffff;
+  --takt-soft: #e3ecfa;
+  --puls: #5b4cf0;
+  --puls-soft: #ebe9fe;
+  --ok: #0f8a47;
+  --ok-soft: #dff4e8;
+  --warn: #9a6100;
+  --warn-soft: #fcf0d6;
+  --bad: #c8302f;
+  --bad-soft: #fde4e3;
+  --chart-1: #0047ab; /* bleibsichtbar cobalt, light surface */
+  --shadow: 0 1px 0 rgb(17 19 24 / 0.02), 0 10px 30px -22px rgb(17 19 24 / 0.18);
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #050506;
+  --shell: #0e0f12;
+  --rail: #1d2027;
+  --glass: rgba(20, 22, 32, 0.62);
+  --glass-line: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 24px 60px -16px rgba(0, 0, 0, 0.6);
+  --aurora-base: #060912;
+  --a1: #0b4fd6; --a2: #5a35e8; --a3: #00918f; --a4: #8a1f6d;
+  --lilac: #a99dff;
+  --surface: #17191e;
+  --surface-2: #1f2228;
+  --line: #272a32;
+  --ink: #f2f1ed;
+  --ink-2: #b8b9be;
+  --ink-3: #8e9098;
+  --takt: #4f8dff;
+  --takt-ink: #04122b;
+  --takt-soft: #10234a;
+  --puls: #9d93ff;
+  --puls-soft: #24204a;
+  --ok: #4cd38a;
+  --ok-soft: #10301f;
+  --warn: #f2b84b;
+  --warn-soft: #33270e;
+  --bad: #ff7b78;
+  --bad-soft: #3a1617;
+  --chart-1: #4f8dff; /* cobalt lifted for dark surface */
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+:focus-visible {
+  outline: 2px solid var(--takt);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+::selection {
+  background: var(--takt-soft);
+}
+
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid transparent;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0 1.1rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.925rem;
+    transition: transform 200ms var(--ease-takt), background 200ms var(--ease-takt), box-shadow 200ms var(--ease-takt);
+    white-space: nowrap;
+  }
+  .btn:active {
+    transform: translateY(1px) scale(0.99);
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--takt);
+    color: var(--takt-ink);
+    box-shadow: 0 6px 16px -8px color-mix(in srgb, var(--takt) 70%, transparent);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--takt) 88%, black);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+  .btn-danger {
+    background: var(--bad-soft);
+    color: var(--bad);
+  }
+  .input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.6rem 0.85rem;
+    border-radius: var(--radius-ctl);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.95rem;
+    transition: border-color 150ms, box-shadow 150ms;
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--takt);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--takt) 18%, transparent);
+  }
+  .label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.01em;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface-2), var(--line), var(--surface-2));
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite linear;
+    border-radius: 10px;
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.rise {
+  /* backwards: no lingering transform, which would trap position:fixed dialogs inside */
+  animation: rise 600ms var(--ease-takt) backwards;
+}
+@keyframes beat {
+  0%, 100% { transform: scaleY(0.45); }
+  50% { transform: scaleY(1); }
+}
+
+/* ── 2FA code boxes ── */
+@keyframes otp-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(3px); }
+}
+.otp-shake { animation: otp-shake 420ms var(--ease-takt); }
+@keyframes otp-tick {
+  from { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+}
+.otp-tick { animation: otp-tick 420ms var(--ease-takt) both; }
+
+/* ── Bell: lifts and swings on hover/focus (no bounce, < 1 s) ── */
+@keyframes bell-swing {
+  0% { transform: translateY(0) rotate(0); }
+  20% { transform: translateY(-2px) rotate(14deg); }
+  40% { transform: translateY(-2px) rotate(-11deg); }
+  60% { transform: translateY(-2px) rotate(7deg); }
+  80% { transform: translateY(-1px) rotate(-3deg); }
+  100% { transform: translateY(0) rotate(0); }
+}
+.bell-host:hover .bell-icon,
+.bell-host:focus-visible .bell-icon { animation: bell-swing 800ms ease-in-out; transform-origin: 50% 8%; }
+
+/* ── Liquid theme switch (View Transitions); fallback: short colour cross-fade ── */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+.liquid-switching ::view-transition-old(root) { z-index: 1; }
+.liquid-switching ::view-transition-new(root) { z-index: 2; }
+.theme-fade, .theme-fade * { transition: background-color 500ms ease, color 500ms ease, border-color 500ms ease !important; }
+
+/* ── Command palette ── */
+@keyframes palette-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+}
+.palette-in { animation: palette-in 220ms var(--ease-takt) both; }
+
+/* ── Wordmark: Postfino wordmark ── */
+.logo-pill { transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.logo-rule { transform-origin: center; }
+a:hover .logo-pill, .logo-mark:hover .logo-pill { transform: translateY(-1px) scale(1.06); }
+.logo-pill-in { animation: logoPill 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 120ms both; }
+.logo-mark .logo-rule { animation: logoRule 800ms var(--ease-takt) 220ms both; }
+@keyframes logoPill { from { opacity: 0; transform: translateY(6px) scale(0.6); } }
+@keyframes logoRule { from { transform: scaleX(0); opacity: 0; } }
+
+/* ── Auth: double-sided glass card with a sweeping skewed panel (galssy-login-page-v2 mechanics, cobalt aurora) ── */
+.auth-root { --a1: #3b82f6; --a2: #7c6cf0; --a3: #22d3ee; --a4: #60a5fa; --aurora-base: #1d4ed8;
+  /* nested theme: Tailwind colour vars resolve at :root, so re-point them here (white text on light glass) */
+  --takt: #1d5bd8; --takt-ink: #fff;
+  --color-ink: #fff; --color-ink-2: rgba(255, 255, 255, 0.82); --color-ink-3: rgba(255, 255, 255, 0.62); --color-line: rgba(255, 255, 255, 0.28);
+  --color-takt: #ffffff; --color-takt-ink: #1d5bd8; --color-bad: #ffd1d6; --color-bad-soft: rgba(255, 80, 100, 0.25); --color-ok: #c8ffe0; --color-ok-soft: rgba(40, 200, 120, 0.25); }
+.auth-root .aurora i { opacity: 0.85; }
+.auth-card { background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.35); border-top-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 30px 70px -18px rgba(10, 30, 90, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.55), inset 0 0 30px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); }
+.auth-sweep { position: absolute; top: -10%; left: 0; width: 200%; height: 120%; z-index: 1; pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.14) 45%, rgba(190, 210, 255, 0.3) 100%);
+  border-left: 1.5px solid rgba(255, 255, 255, 0.28); border-right: 1.5px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 50px rgba(10, 30, 90, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(170%); -webkit-backdrop-filter: blur(20px) saturate(170%);
+  transform: translateX(25%) skewX(-7deg); transition: transform 850ms cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; }
+.auth-card.is-register .auth-sweep { transform: translateX(-75%) skewX(-7deg); }
+.auth-pane, .auth-welcome { position: absolute; top: 0; height: 100%; width: 50%; display: flex; align-items: center; box-sizing: border-box; }
+.auth-pane { z-index: 5; justify-content: center; padding: 40px 48px; }
+.auth-welcome { z-index: 6; padding-top: 40px; padding-bottom: 40px; }
+.auth-welcome.right-0 { padding-right: 44px; }
+.auth-welcome.left-0 { padding-left: 44px; }
+.auth-pane.is-on, .auth-welcome.is-on { opacity: 1; transform: none; transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1) 220ms, transform 420ms cubic-bezier(0.22, 1, 0.36, 1) 220ms; }
+.auth-pane.is-off-l, .auth-welcome.is-off-l { opacity: 0; transform: translateX(-24px); pointer-events: none; transition: opacity 380ms cubic-bezier(0.22, 1, 0.36, 1), transform 380ms cubic-bezier(0.22, 1, 0.36, 1); }
+.auth-pane.is-off-r, .auth-welcome.is-off-r { opacity: 0; transform: translateX(24px); pointer-events: none; transition: opacity 380ms cubic-bezier(0.22, 1, 0.36, 1), transform 380ms cubic-bezier(0.22, 1, 0.36, 1); }
+.auth-mascot { animation: mascotFloat 7s ease-in-out infinite; -webkit-mask-image: radial-gradient(70% 70% at 50% 50%, #000 60%, transparent 100%); mask-image: radial-gradient(70% 70% at 50% 50%, #000 60%, transparent 100%); }
+.auth-root .input { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.35); color: #fff; }
+.auth-root .input::placeholder { color: rgba(255, 255, 255, 0.6); }
+.auth-root .btn-primary { background: #fff; color: #1d5bd8; box-shadow: 0 10px 24px -10px rgba(10, 30, 90, 0.6); }
+.auth-root .btn-primary:hover { background: #eef3ff; }
+.auth-root .input:focus { background: rgba(255, 255, 255, 0.24); border-color: #fff; box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.18); }
+.auth-root .label { color: rgba(255, 255, 255, 0.75); }
+
+/* ── Liquid OTP (liquid-otp-v2): cobalt water rising in each box, merge into a green drop on success ── */
+.lq-fill { background: linear-gradient(180deg, #4e8dff 0%, #1d5bd8 100%); }
+.lq-wave { position: absolute; top: -8px; left: 0; width: 200%; height: 10px; animation: lqWave 1.5s linear infinite;
+  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 10" xmlns="http://www.w3.org/2000/svg"><path d="M 0 5 Q 25 0 50 5 T 100 5 L 100 10 L 0 10 Z" fill="%234e8dff"/></svg>') 0 0 / 50% 100% repeat-x; }
+@keyframes lqWave { to { transform: translateX(-50%); } }
+.lq-bubble { position: absolute; bottom: -8px; border-radius: 50%; background: rgba(255, 255, 255, 0.6); animation: lqRise 2s ease-in infinite; }
+@keyframes lqRise { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-62px); opacity: 0; } }
+.lq-drop-wave { position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6); animation: lqPulse 1.6s ease-out 0.6s infinite; }
+@keyframes lqPulse { to { box-shadow: 0 0 0 18px rgba(52, 211, 153, 0); } }
+.lq-caret { animation: lqCaret 1s steps(1) infinite; }
+@keyframes lqCaret { 50% { opacity: 0; } }
+.code-mail { animation: codeMail 2.8s ease-in-out infinite; }
+@keyframes codeMail { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-5px) rotate(-4deg); } }
+
+/* ── Glass shell: animated aurora backdrop + frosted panels ── */
+.aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: var(--aurora-base); pointer-events: none; }
+.aurora i { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(90px); opacity: 0.6; will-change: transform; }
+.aurora i:nth-child(1) { background: var(--a1); top: -20vmax; left: -12vmax; animation: auroraA 26s ease-in-out infinite alternate; }
+.aurora i:nth-child(2) { background: var(--a2); top: 10vmax; right: -18vmax; animation: auroraB 32s ease-in-out infinite alternate; }
+.aurora i:nth-child(3) { background: var(--a3); bottom: -28vmax; left: 18vmax; animation: auroraC 38s ease-in-out infinite alternate; opacity: 0.45; }
+.aurora i:nth-child(4) { background: var(--a4); top: 30vmax; left: -20vmax; width: 40vmax; height: 40vmax; animation: auroraB 44s ease-in-out infinite alternate-reverse; opacity: 0.35; }
+@keyframes auroraA { to { transform: translate(28vmax, 18vmax) scale(1.15); } }
+@keyframes auroraB { to { transform: translate(-24vmax, 14vmax) scale(0.9); } }
+@keyframes auroraC { to { transform: translate(-10vmax, -26vmax) scale(1.2); } }
+.glass { background: var(--glass); border: 1.5px solid var(--glass-line); box-shadow: var(--glass-shadow); backdrop-filter: blur(36px) saturate(180%); -webkit-backdrop-filter: blur(36px) saturate(180%); }
+.glass-rail { background: rgba(18, 20, 28, 0.78); border: 1.5px solid rgba(255, 255, 255, 0.12); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35); backdrop-filter: blur(36px) saturate(190%); -webkit-backdrop-filter: blur(36px) saturate(190%); }
+.glass-pill { background: color-mix(in srgb, var(--surface) 55%, transparent); border: 1px solid var(--glass-line); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+/* white content tiles keep light-theme ink in both themes (as in the reference) */
+.tile { background: #fff; border-radius: 20px; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08); transition: transform 220ms var(--ease-takt), box-shadow 220ms var(--ease-takt);
+  --color-ink: #111318; --color-ink-2: #4a4d55; --color-ink-3: #6b6e76; --color-line: #eceef2; --color-surface: #fff; --color-surface-2: #f3f5f8; --color-bg: #fff; color: #111318; }
+a.tile:hover, .tile-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14); }
+.tile * { --surface: #fff; --surface-2: #f3f5f8; --line: #eceef2; --ink: #111318; --ink-2: #4a4d55; --ink-3: #6b6e76; }
+
+.tile-in { animation: tileIn 700ms var(--ease-takt) backwards; animation-delay: calc(var(--i, 0) * 70ms + 80ms); }
+.tile-bar { transform-box: fill-box; transform-origin: bottom; animation: barGrow 800ms var(--ease-takt) backwards; animation-delay: calc(var(--i, 0) * 60ms + 400ms); }
+.tile-pulse { stroke-dasharray: 260; stroke-dashoffset: 260; animation: drawLine 1600ms var(--ease-takt) 400ms forwards; }
+.tile-gauge { animation: gaugeIn 1200ms var(--ease-takt) 400ms backwards; }
+@keyframes gaugeIn { from { stroke-dasharray: 0 100; } }
+
+/* ── Bento dashboard ── */
+.wave-hand { animation: waveHand 2.4s ease-in-out 600ms 2; }
+@keyframes waveHand { 0%, 60%, 100% { transform: rotate(0); } 10%, 30% { transform: rotate(16deg); } 20% { transform: rotate(-8deg); } 40% { transform: rotate(-4deg); } 50% { transform: rotate(10deg); } }
+.star-spin { transform-origin: 50px 50px; animation: starSpin 18s linear infinite; }
+@keyframes starSpin { to { transform: rotate(360deg); } }
+.add-card .add-plus { transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.add-card:hover .add-plus { transform: rotate(90deg) scale(1.1); }
+.add-card { transition: border-color 300ms; }
+a:hover > .add-card { border-color: var(--takt); }
+.week-day { animation: tileIn 700ms var(--ease-takt) both; animation-delay: calc(var(--i, 0) * 60ms + 300ms); }
+
+/* ── Liquid rail ── */
+/* wordmark straight on the dark glass: white letters, translucent hairlines, cobalt-bright pill */
+.rail-logo { --color-ink: #ffffff; --color-takt: #4f8dff; --color-takt-ink: #ffffff; }
+
+/* ── Sidebar: width morph, sliding active pill, hover tips in rail mode ── */
+.sb { transition: width 380ms var(--ease-takt); }
+.sb-pill { top: 0; transition: transform 420ms var(--ease-takt), height 420ms var(--ease-takt); }
+.sb-nav::-webkit-scrollbar { width: 0; }
+.usage-bar { transform-origin: left; animation: usageIn 1100ms var(--ease-takt) 300ms both; }
+@keyframes usageIn { from { transform: scaleX(0); } }
+.sb[data-collapsed] [data-tip] { position: relative; }
+.sb[data-collapsed] [data-tip]:hover::after, .sb[data-collapsed] [data-tip]:focus-visible::after {
+  content: attr(data-tip); position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%);
+  white-space: nowrap; padding: 6px 10px; border-radius: 10px; background: var(--ink); color: var(--bg);
+  font-size: 0.75rem; font-weight: 600; z-index: 60; pointer-events: none; animation: fadeIn 160ms var(--ease-takt) both;
+}
+
+/* ── Dashboard motion: everything settles in once, then stays still ── */
+.seg-thumb { transition: transform 450ms var(--ease-takt); }
+.spark-line { stroke-dasharray: 400; stroke-dashoffset: 400; animation: drawLine 1200ms var(--ease-takt) 350ms forwards; }
+.rhythm-line { stroke-dasharray: 2000; stroke-dashoffset: 2000; animation: drawLine 1600ms var(--ease-takt) 200ms forwards; }
+.rhythm-area { animation: fadeIn 900ms var(--ease-takt) 700ms both; }
+@keyframes drawLine { to { stroke-dashoffset: 0; } }
+@keyframes fadeIn { from { opacity: 0; } }
+.donut-seg { animation: fadeIn 600ms var(--ease-takt) both; animation-delay: calc(var(--i, 0) * 120ms + 300ms); }
+.heat-cell { animation: heatIn 500ms var(--ease-takt) both; animation-delay: calc(var(--i, 0) * 6ms + 200ms); transition: transform 200ms var(--ease-takt); }
+.heat-cell:hover { transform: scale(1.18); position: relative; z-index: 1; }
+@keyframes heatIn { from { opacity: 0; transform: scale(0.6); } }
+.ring-grow { animation: ringGrow 1200ms var(--ease-takt) 300ms both; }
+@keyframes ringGrow { from { stroke-dasharray: 0 97.4; } }
+.step { animation: tileIn 700ms var(--ease-takt) both; animation-delay: calc(var(--i, 0) * 70ms + 150ms); }
+.live-dot { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent); animation: livePulse 2.4s ease-out infinite; }
+@keyframes livePulse { 70% { box-shadow: 0 0 0 6px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.timeline::before { content: ""; position: absolute; left: 9px; top: 18px; bottom: 18px; width: 1px; background: linear-gradient(var(--line), var(--line) 80%, transparent); }
+
+/* ── Login left pane: network mascots on their own navy (#0f1034 = the artwork's edge colour, so it sits seamless) ── */
+.mascot-pane { background: #0f1034; --color-ink: #ffffff; --color-takt: #6f9dff; }
+.mascot-glow {
+  position: absolute; inset: -20%; pointer-events: none;
+  background: radial-gradient(40% 35% at 50% 52%, rgb(0 71 171 / 0.55), transparent 70%), radial-gradient(30% 30% at 85% 10%, rgb(79 141 255 / 0.18), transparent 70%);
+  animation: mascotGlow 9s ease-in-out infinite;
+}
+@keyframes mascotGlow { 50% { transform: scale(1.06); opacity: 0.8; } }
+.mascot-art {
+  height: auto;
+  mix-blend-mode: lighten; /* artwork navy drops out, glow shows through: no visible image edge */
+  -webkit-mask-image: radial-gradient(75% 75% at 50% 50%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(75% 75% at 50% 50%, #000 62%, transparent 100%);
+  animation: mascotIn 1000ms var(--ease-takt) both, mascotFloat 7s ease-in-out 1000ms infinite;
+}
+@keyframes mascotIn { from { opacity: 0; transform: translateY(24px) scale(0.96); } }
+@keyframes mascotFloat { 50% { transform: translateY(-10px); } }
+
+/* ── Stat tiles with the cobalt "hot" glow (studio dashboard v14 layout, Bleibsichtbar blue) ── */
+.stat-tile {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
+  min-height: 150px; padding: 18px; border-radius: 20px; background: var(--surface);
+  transition: transform 400ms var(--ease-takt), box-shadow 400ms var(--ease-takt);
+  animation: tileIn 800ms var(--ease-takt) both; animation-delay: calc(var(--i, 0) * 90ms + 120ms);
+}
+.stat-tile:hover { transform: translateY(-3px); }
+@keyframes tileIn { from { opacity: 0; transform: translateY(16px) scale(0.95); } }
+.stat-tile .stat-ic { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); transition: transform 600ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.stat-tile:hover .stat-ic { transform: rotate(-12deg) scale(1.08); }
+.stat-tile .stat-glow { position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: radial-gradient(130% 120% at 0% 0%, #6f9dff 0%, transparent 46%), linear-gradient(150deg, #2f6fe0 0%, #0047ab 52%, #00307a 100%);
+  clip-path: circle(0% at 0% 0%); }
+.stat-tile.hot .stat-glow { clip-path: circle(150% at 0% 0%); animation: glowIn 1100ms var(--ease-takt) both; animation-delay: 420ms; }
+@keyframes glowIn { from { clip-path: circle(0% at 0% 0%); } }
+.stat-tile.hot { box-shadow: 0 16px 30px -24px #0047ab; color: #fff; }
+.stat-tile.hot .stat-ic { background: rgb(255 255 255 / 0.2); color: #fff; }
+.stat-tile.hot .stat-sub { color: rgb(255 255 255 / 0.8); }
+.hatch { background: repeating-linear-gradient(115deg, var(--line) 0 1.6px, transparent 1.6px 5px); }
+@keyframes barGrow { from { transform: scaleY(0); } }
+.bar-grow { transform-origin: bottom; animation: barGrow 900ms var(--ease-takt) both; animation-delay: calc(var(--i, 0) * 35ms + 300ms); }
+@keyframes shellIn { from { opacity: 0; } }
+/* opacity only: any transform on the frame would trap position:fixed children (bottom bar, dialogs) */
+.shell-in { animation: shellIn 700ms var(--ease-takt) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,417 @@
+openapi: 3.1.0
+info:
+  title: SichtTakt Public API
+  version: 1.0.0-draft
+  summary: Publishing-as-a-Service by Bleibsichtbar LLC
+  description: |
+    Server-to-server API for Pro, Agency and Enterprise plans.
+
+    * Auth: `Authorization: Bearer st_live_…` (or `st_test_…`: sandbox accounts only). Never embed keys in browsers or mobile apps.
+    * All write requests require an `Idempotency-Key` header (8–200 chars). Same key + same body → replayed response (`Idempotent-Replayed: true`); same key + different body → 422.
+    * Quotas: monthly request quota per organization (`X-Quota-Limit`, `X-Quota-Remaining`), per-key burst limit. Exceeded → 429 with `Retry-After`.
+    * The request quota is NOT a number of successful social posts; network-side limits (e.g. Instagram 100 API posts / 24 h) apply in addition.
+    * Unsupported network features return 422 `CAPABILITY_NOT_SUPPORTED` with `details.alternatives` — success is never simulated.
+servers:
+  - url: http://localhost:3611
+    description: Local development
+  - url: https://api.example-domain.invalid
+    description: Production (domain not yet decided)
+security:
+  - bearerAuth: []
+tags:
+  - name: Workspaces
+  - name: Accounts
+  - name: Media
+  - name: Posts
+  - name: Calendar
+  - name: Analytics
+  - name: Usage
+  - name: Webhooks
+  - name: Links
+paths:
+  /api/v1/workspaces:
+    get:
+      tags: [Workspaces]
+      summary: List workspaces the key may access
+      x-scope: workspaces:read
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: object, properties: { data: { type: array, items: { $ref: "#/components/schemas/Workspace" } } } } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/accounts:
+    get:
+      tags: [Accounts]
+      summary: List connected social accounts
+      x-scope: accounts:read
+      parameters:
+        - { name: workspace_id, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: object, properties: { data: { type: array, items: { $ref: "#/components/schemas/Account" } } } } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/accounts/connect:
+    post:
+      tags: [Accounts]
+      summary: Start an official OAuth connect flow (end user must consent on SichtTakt's page)
+      x-scope: accounts:connect
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [workspace_id, platform]
+              properties:
+                workspace_id: { type: string, format: uuid }
+                platform: { type: string, enum: [instagram_business, sandbox] }
+                redirect_after: { type: string, format: uri, description: Where the user lands after consent; `?connected=<n>` is appended }
+      responses:
+        "200": { description: Redirect the user to authorization_url, content: { application/json: { schema: { type: object, properties: { authorization_url: { type: string }, expires_in: { type: integer } } } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/media/uploads:
+    post:
+      tags: [Media]
+      summary: Create a media asset and get the upload target
+      x-scope: media:write
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [workspace_id, filename, mime_type, size_bytes]
+              properties:
+                workspace_id: { type: string, format: uuid }
+                filename: { type: string }
+                mime_type: { type: string, enum: [video/mp4, video/quicktime, image/jpeg, image/png, image/webp, application/pdf] }
+                size_bytes: { type: integer }
+                purpose: { type: string, enum: [video, image, cover, document], default: image }
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { type: object, properties: { id: { type: string }, status: { type: string }, upload: { type: object, properties: { method: { type: string }, url: { type: string }, headers: { type: object } } } } } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/media/{media_id}/content:
+    put:
+      tags: [Media]
+      summary: Upload raw bytes; file signature, size and media limits are validated
+      x-scope: media:write
+      parameters: [{ name: media_id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/octet-stream: { schema: { type: string, format: binary } } } }
+      responses:
+        "200": { description: Ready, content: { application/json: { schema: { $ref: "#/components/schemas/Media" } } } }
+        "422": { description: MEDIA_INVALID (emits media.failed), content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+  /api/v1/media/{media_id}:
+    get:
+      tags: [Media]
+      x-scope: media:write
+      parameters: [{ name: media_id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Media" } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/posts:
+    post:
+      tags: [Posts]
+      summary: Create a draft or scheduled post
+      description: |
+        `201` = stored (draft or awaiting approval). `202` = scheduled; publishing runs asynchronously, follow via webhooks or GET.
+        Workspaces with approval enabled never publish before approval of the current version.
+        `cover_asset_id` (independent Reels cover) is accepted for automatic publishing only when the account's capability
+        `reel.independent_cover` is verified; otherwise 422 with alternatives `notification` / `video_frame`.
+      x-scope: posts:write
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatePost" }
+            example:
+              workspace_id: 3f1c…
+              account_ids: [9a2e…]
+              type: reel
+              caption: Unser neuer Cocktail ist da!
+              video_asset_id: 5b7d…
+              cover_asset_id: 8c1a…
+              scheduled_at: "2026-11-12T10:00:00+01:00"
+              status: scheduled
+      responses:
+        "201": { description: Stored, content: { application/json: { schema: { $ref: "#/components/schemas/Post" } } } }
+        "202": { description: Scheduled, content: { application/json: { schema: { $ref: "#/components/schemas/Post" } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/posts/{post_id}:
+    get:
+      tags: [Posts]
+      x-scope: posts:read
+      parameters: [{ $ref: "#/components/parameters/PostId" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Post" } } } }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      tags: [Posts]
+      summary: Update; a content change on an approved post requires re-approval
+      x-scope: posts:write
+      parameters: [{ $ref: "#/components/parameters/PostId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caption: { type: string }
+                scheduled_at: { type: [string, "null"] }
+                video_asset_id: { type: string }
+                cover_asset_id: { type: [string, "null"] }
+                media_asset_ids: { type: array, items: { type: string } }
+                tags: { type: array, items: { type: string } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Post" } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/posts/{post_id}/approve:
+    post:
+      tags: [Posts]
+      x-scope: posts:publish
+      parameters: [{ $ref: "#/components/parameters/PostId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody: { content: { application/json: { schema: { type: object, properties: { decision: { type: string, enum: [approved, changes_requested] }, comment: { type: string } } } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Post" } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/posts/{post_id}/publish:
+    post:
+      tags: [Posts]
+      summary: Publish now (never bypasses approval)
+      x-scope: posts:publish
+      parameters: [{ $ref: "#/components/parameters/PostId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      responses:
+        "202": { description: Queued, content: { application/json: { schema: { $ref: "#/components/schemas/Post" } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/posts/{post_id}/cancel:
+    post:
+      tags: [Posts]
+      x-scope: posts:write
+      parameters: [{ $ref: "#/components/parameters/PostId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Post" } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/posts/{post_id}/reschedule:
+    post:
+      tags: [Calendar]
+      summary: Move a post to a new time (not a content change; approval stays valid)
+      x-scope: posts:write
+      parameters: [{ $ref: "#/components/parameters/PostId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [scheduled_at], properties: { scheduled_at: { type: string, format: date-time } } } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Post" } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/posts/{post_id}/clone:
+    post:
+      tags: [Posts]
+      summary: Duplicate / re-share as a new unscheduled draft
+      x-scope: posts:write
+      parameters: [{ $ref: "#/components/parameters/PostId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { $ref: "#/components/schemas/Post" } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/accounts/{account_id}/slots:
+    get:
+      tags: [Calendar]
+      summary: Weekly posting slots (local time of the account; weekday 1=Mon … 7=Sun)
+      x-scope: calendar:read
+      parameters: [{ name: account_id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses: { "200": { description: OK } }
+    put:
+      tags: [Calendar]
+      summary: Replace weekly posting slots. Posts created with "queue":true use the next free slot.
+      x-scope: posts:publish
+      parameters: [{ name: account_id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                slots: { type: array, items: { type: object, properties: { weekday: { type: integer, minimum: 1, maximum: 7 }, minute_of_day: { type: integer, minimum: 0, maximum: 1439 } } } }
+      responses: { "200": { description: OK } }
+  /api/v1/calendar:
+    get:
+      tags: [Calendar]
+      x-scope: calendar:read
+      parameters:
+        - { name: workspace_id, in: query, required: true, schema: { type: string, format: uuid } }
+        - { name: from, in: query, required: true, schema: { type: string, format: date-time } }
+        - { name: to, in: query, required: true, schema: { type: string, format: date-time }, description: max 93 days after from }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: object, properties: { data: { type: array, items: { $ref: "#/components/schemas/Post" } } } } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/analytics/posts/{post_id}:
+    get:
+      tags: [Analytics]
+      summary: Post metrics. Metrics not collected or not offered by the network are `null` (N/A), never 0.
+      x-scope: analytics:read
+      parameters: [{ $ref: "#/components/parameters/PostId" }]
+      responses:
+        "200": { description: OK }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/links:
+    post:
+      tags: [Links]
+      summary: Create (or reuse) a short link on SichtTakt's own domain. Clicks are counted without cookies or IP.
+      x-scope: posts:write
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [workspace_id, url], properties: { workspace_id: { type: string, format: uuid }, url: { type: string, format: uri } } }
+            example: { workspace_id: "3f1c…", url: "https://shop.example.de/herbst?utm_source=instagram" }
+      responses:
+        "201": { description: Created, content: { application/json: { schema: { type: object, properties: { id: { type: string }, code: { type: string }, short_url: { type: string }, target_url: { type: string }, clicks: { type: integer } } } } } }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/usage:
+    get:
+      tags: [Usage]
+      x-scope: usage:read
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plan: { type: string }
+                  period_start: { type: string, format: date-time }
+                  api_requests: { type: object, properties: { used: { type: integer }, limit: { type: integer } } }
+                  channels: { type: object, properties: { used: { type: integer }, limit: { type: [integer, "null"] } } }
+  /api/v1/webhooks:
+    get:
+      tags: [Webhooks]
+      x-scope: webhooks:manage
+      responses: { "200": { description: OK } }
+    post:
+      tags: [Webhooks]
+      summary: Create a subscription. The signing secret is returned once.
+      x-scope: webhooks:manage
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, events]
+              properties:
+                url: { type: string, format: uri, description: https only }
+                events: { type: array, items: { $ref: "#/components/schemas/WebhookEvent" } }
+                workspace_id: { type: string, format: uuid }
+                description: { type: string }
+      responses:
+        "201": { description: Created (includes `secret`) }
+        default: { $ref: "#/components/responses/Error" }
+  /api/v1/webhooks/{webhook_id}:
+    delete:
+      tags: [Webhooks]
+      x-scope: webhooks:manage
+      parameters: [{ name: webhook_id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses: { "204": { description: Deleted } }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: "st_<live|test>_<id>_<secret>" }
+  parameters:
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 8, maxLength: 200 } }
+    PostId: { name: post_id, in: path, required: true, schema: { type: string, format: uuid } }
+  responses:
+    Error:
+      description: Error
+      headers: { Retry-After: { schema: { type: integer }, description: on 429 } }
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum: [UNAUTHENTICATED, INVALID_API_KEY, API_KEY_REVOKED, API_KEY_EXPIRED, FORBIDDEN, INSUFFICIENT_SCOPE, PLAN_FEATURE_UNAVAILABLE, WORKSPACE_NOT_ALLOWED, NOT_FOUND, CONFLICT, IDEMPOTENCY_KEY_REQUIRED, IDEMPOTENCY_KEY_REUSED, VALIDATION_FAILED, MEDIA_INVALID, CAPABILITY_NOT_SUPPORTED, INVALID_STATE_TRANSITION, APPROVAL_REQUIRED, CHANNEL_NOT_ACTIVE, QUOTA_EXCEEDED, RATE_LIMITED, PROVIDER_NOT_CONFIGURED, PROVIDER_ERROR, INTERNAL]
+            message: { type: string }
+            details: {}
+            request_id: { type: string }
+    Workspace:
+      type: object
+      properties: { id: { type: string }, name: { type: string }, timezone: { type: string }, approval_required: { type: boolean } }
+    Account:
+      type: object
+      properties:
+        id: { type: string }
+        workspace_id: { type: string }
+        platform: { type: string }
+        display_name: { type: string }
+        username: { type: [string, "null"] }
+        status: { type: string, enum: [active, needs_reauth, revoked, disconnected] }
+        is_sandbox: { type: boolean }
+        granted_scopes: { type: array, items: { type: string } }
+    Media:
+      type: object
+      properties:
+        id: { type: string }
+        status: { type: string, enum: [pending_upload, ready, rejected] }
+        mime_type: { type: string }
+        width: { type: [integer, "null"] }
+        height: { type: [integer, "null"] }
+        duration_ms: { type: [integer, "null"] }
+        validation_errors: { type: array, items: { type: string } }
+    CreatePost:
+      type: object
+      required: [workspace_id, account_ids, type]
+      properties:
+        workspace_id: { type: string, format: uuid }
+        account_ids: { type: array, items: { type: string, format: uuid }, minItems: 1 }
+        type: { type: string, enum: [text, image, video, carousel, story, reel, short, document, thread] }
+        caption: { type: string, maxLength: 5000 }
+        media_asset_ids: { type: array, items: { type: string } }
+        video_asset_id: { type: string, description: required for reel }
+        cover_asset_id: { type: string, description: independent cover image (reel only), must differ from video }
+        cover_mode: { type: string, enum: [video_frame, independent_image] }
+        thumb_offset_ms: { type: integer }
+        scheduled_at: { type: string, description: ISO-8601 with explicit offset; stored as UTC }
+        timezone: { type: string, description: IANA zone, defaults to workspace zone }
+        status: { type: string, enum: [draft, scheduled], default: draft }
+        queue: { type: boolean, description: Use the next free posting slot of each account instead of scheduled_at }
+        publish_mode: { type: string, enum: [automatic, notification], default: automatic }
+        targets:
+          type: array
+          items:
+            type: object
+            properties: { account_id: { type: string }, caption: { type: string }, publish_mode: { type: string }, share_to_feed: { type: boolean }, first_comment: { type: string } }
+        tags: { type: array, items: { type: string } }
+        external_ref: { type: string, description: your own reference (e.g. CMS id) }
+    Post:
+      type: object
+      properties:
+        id: { type: string }
+        workspace_id: { type: string }
+        type: { type: string }
+        status: { type: string, enum: [IDEA, DRAFT, PENDING_APPROVAL, CHANGES_REQUESTED, APPROVED, SCHEDULED, PREPARING_MEDIA, PUBLISHING, PUBLISHED, FAILED_RETRYABLE, FAILED_FINAL, NOTIFICATION_SENT, CANCELLED] }
+        caption: { type: string }
+        cover_mode: { type: [string, "null"] }
+        scheduled_at: { type: [string, "null"] }
+        timezone: { type: [string, "null"] }
+        version: { type: integer }
+        approved_version: { type: [integer, "null"] }
+        external_ref: { type: [string, "null"] }
+        targets:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              account_id: { type: string }
+              status: { type: string }
+              publish_mode: { type: string }
+              external_post_id: { type: [string, "null"] }
+              permalink: { type: [string, "null"] }
+              error_code: { type: [string, "null"] }
+              error_message: { type: [string, "null"] }
+              attempts: { type: integer }
+    WebhookEvent:
+      type: string
+      enum: [account.connected, account.disconnected, post.created, post.approved, post.scheduled, post.published, post.failed, media.failed, quota.threshold_reached]

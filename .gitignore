@@ -1,0 +1,35 @@
+node_modules
+.next
+.data
+.env
+.env.*
+!.env.example
+*.log
+coverage
+dist
+poc-output
+tmp
+.next-build
+sdks/typescript/dist
+scripts/.qa-*
+*.tsbuildinfo
+.data-db.log
+
+# internal planning notes (kept local)
+docs/PRD.md
+docs/SPRINTS.md
+docs/BUFFER_PARITY_MATRIX.md
+docs/REELS_COVER_POC.md
+docs/APP_REVIEW_CHECKLIST.md
+docs/DPA_COMPLIANCE_CHECKLIST.md
+docs/BILLING_PLAN_MATRIX.md
+docs/PUBLIC_API_PRD.md
+
+# editor / assistant files
+.claude/
+CLAUDE.md
+AGENTS.md
+.vscode/
+
+# old wordmark artwork, not used
+apps/web/public/brand/logo-wordmark.png

@@ -1,0 +1,35 @@
+{
+  "menuPage": {
+    "message": "Seite an Postfino senden"
+  },
+  "menuImage": {
+    "message": "Bild an Postfino senden"
+  },
+  "menuSelection": {
+    "message": "Auswahl an Postfino senden"
+  },
+  "share": {
+    "message": "An Postfino senden"
+  },
+  "settings": {
+    "message": "Einstellungen"
+  },
+  "baseLabel": {
+    "message": "Postfino-Adresse"
+  },
+  "baseHint": {
+    "message": "Nur HTTPS (HTTP nur für localhost). Es werden keine Zugangsdaten gespeichert – du bist über deine normale Anmeldung eingeloggt."
+  },
+  "save": {
+    "message": "Speichern"
+  },
+  "saved": {
+    "message": "Gespeichert."
+  },
+  "extName": {
+    "message": "Postfino"
+  },
+  "extDescription": {
+    "message": "Seiten, Bilder und Textstellen als Idee oder Beitrag an Postfino übergeben."
+  }
+}

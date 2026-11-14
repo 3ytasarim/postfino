@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <title>Postfino</title>
+    <link rel="stylesheet" href="popup.css" />
+    <style>
+      body { width: auto; max-width: 480px; padding: 24px; }
+      label { display: block; font-weight: 600; margin-bottom: 6px; }
+      input { width: 100%; box-sizing: border-box; min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: transparent; color: inherit; font: inherit; }
+      p.hint { color: var(--muted); font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1 data-i18n="settings"></h1>
+    <label for="base" data-i18n="baseLabel"></label>
+    <input id="base" type="url" placeholder="https://app.sichttakt.de" />
+    <p class="hint" data-i18n="baseHint"></p>
+    <button id="save" class="primary" data-i18n="save"></button>
+    <p id="status" role="status" class="hint"></p>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

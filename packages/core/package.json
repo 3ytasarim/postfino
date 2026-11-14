@@ -1,0 +1,24 @@
+{
+  "name": "@sichttakt/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0",
+    "@sichttakt/config": "workspace:*",
+    "@sichttakt/db": "workspace:*",
+    "@sichttakt/shared": "workspace:*",
+    "@sichttakt/social-adapters": "workspace:*",
+    "drizzle-orm": "^0.45.4",
+    "nodemailer": "^10.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^8.0.2"
+  }
+}

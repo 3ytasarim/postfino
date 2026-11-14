@@ -1,0 +1,13 @@
+{
+  "name": "@sichttakt/sdk",
+  "version": "0.1.0",
+  "description": "Official SichtTakt Public API v1 client (TypeScript/JavaScript). Zero dependencies.",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "files": ["dist", "README.md"],
+  "engines": { "node": ">=18" },
+  "scripts": { "build": "tsc -p tsconfig.json" }
+}

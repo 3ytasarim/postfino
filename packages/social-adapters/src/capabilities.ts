@@ -1,0 +1,240 @@
+import type { CapabilityState, Platform } from "@sichttakt/shared";
+
+// Versioned platform capability matrix. Mirrors docs/PLATFORM_CAPABILITIES.md and is seeded into
+// `channel_capabilities` (platform defaults). "supported" here means *documented by the official API*;
+// it does NOT mean verified live in SichtTakt — that is tracked by `verifiedAt` per row.
+
+export const CAPABILITY_MATRIX_VERSION = "2026-11-08";
+
+export const CAPABILITY_KEYS = [
+  "post.text",
+  "post.image",
+  "post.video",
+  "post.carousel",
+  "post.story",
+  "post.reel",
+  "post.short",
+  "post.document",
+  "post.thread",
+  "reel.independent_cover",
+  "reel.thumb_offset",
+  "reel.share_to_feed",
+  "reel.trial",
+  "post.first_comment",
+  "post.collaborators",
+  "post.location",
+  "post.user_tags",
+  "post.music",
+  "post.stickers",
+  "post.product_tags",
+  "insights.account",
+  "insights.post",
+  "community.comments_read",
+  "community.comments_reply",
+  "community.mentions",
+  "community.dm",
+] as const;
+export type CapabilityKey = (typeof CAPABILITY_KEYS)[number];
+
+export type CapabilityEntry = { state: CapabilityState; note?: string; source?: string };
+export type CapabilityMap = Partial<Record<CapabilityKey, CapabilityEntry>>;
+
+const META_REF = "https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/media";
+const META_PUB = "https://developers.facebook.com/docs/instagram-platform/content-publishing";
+
+const s = (state: CapabilityState, note?: string, source?: string): CapabilityEntry => ({ state, note, source });
+
+export const PLATFORM_CAPABILITIES: Record<Platform, CapabilityMap> = {
+  instagram_business: {
+    "post.image": s("requires_app_review", "instagram_content_publish (Advanced Access) für fremde Konten", META_PUB),
+    "post.carousel": s("requires_app_review", "max. 10 Elemente laut Meta-Doku", META_PUB),
+    "post.reel": s("requires_app_review", "media_type=REELS, Facebook-Login-Flow", META_REF),
+    "post.story": s("requires_app_review", "media_type=STORIES; Text/Links/Sticker nicht per API", META_PUB),
+    "post.video": s("requires_app_review", "Einzelvideo wird als Reel veröffentlicht", META_PUB),
+    "post.text": s("unsupported", "Instagram erfordert Medien"),
+    "post.document": s("unsupported"),
+    "post.thread": s("unsupported"),
+    "post.short": s("unsupported"),
+    "reel.independent_cover": s("unverified", "cover_url dokumentiert (Reels-Tab). Profilraster-Darstellung erst nach Live-PoC bestätigt", META_REF),
+    "reel.thumb_offset": s("requires_app_review", "thumb_offset in ms; wird ignoriert, wenn cover_url gesetzt ist", META_REF),
+    "reel.share_to_feed": s("requires_app_review", undefined, META_REF),
+    "reel.trial": s("unverified", "trial_params.graduation_strategy MANUAL|SS_PERFORMANCE", META_REF),
+    "post.first_comment": s("requires_app_review", "über /{media-id}/comments nach Veröffentlichung (instagram_manage_comments)"),
+    "post.collaborators": s("unverified", "max. 3 Benutzernamen", META_REF),
+    "post.location": s("unverified", "location_id = Page-ID mit Standort", META_REF),
+    "post.user_tags": s("unverified", "Reels: nur Benutzernamen", META_REF),
+    "post.music": s("requires_manual_notification", "Audio-/Musikauswahl nicht per API"),
+    "post.stickers": s("requires_manual_notification"),
+    "post.product_tags": s("requires_manual_notification"),
+    "insights.account": s("requires_app_review", "instagram_manage_insights"),
+    "insights.post": s("requires_app_review", "instagram_manage_insights; einige Reels-Metriken nicht verfügbar"),
+    "community.comments_read": s("requires_app_review", "instagram_manage_comments"),
+    "community.comments_reply": s("requires_app_review", "instagram_manage_comments"),
+    "community.mentions": s("unverified"),
+    "community.dm": s("unsupported", "Messaging API außerhalb des Scopes"),
+  },
+  instagram_personal: {
+    "post.image": s("requires_manual_notification", "Privatkonten haben keinen API-Zugang"),
+    "post.reel": s("requires_manual_notification"),
+    "post.story": s("requires_manual_notification"),
+    "post.carousel": s("requires_manual_notification"),
+    "reel.independent_cover": s("requires_manual_notification", "Cover in der Instagram-App wählen"),
+    "insights.account": s("unsupported"),
+    "community.comments_read": s("unsupported"),
+  },
+  facebook_page: {
+    "post.text": s("requires_app_review", "pages_manage_posts"),
+    "post.image": s("requires_app_review"),
+    "post.video": s("requires_app_review"),
+    "post.reel": s("unverified", "Facebook Reels Publishing API"),
+    "post.story": s("unverified"),
+    "post.carousel": s("unverified"),
+    "post.first_comment": s("requires_app_review", "/{post-id}/comments, pages_manage_engagement"),
+    "insights.account": s("requires_app_review", "read_insights"),
+    "insights.post": s("requires_app_review"),
+    "community.comments_read": s("requires_app_review", "pages_read_user_content"),
+    "community.comments_reply": s("requires_app_review", "pages_manage_engagement"),
+  },
+  facebook_group: {
+    "post.text": s("requires_manual_notification", "Groups API für Drittanbieter eingestellt"),
+    "post.image": s("requires_manual_notification"),
+    "post.video": s("requires_manual_notification"),
+    "insights.account": s("unsupported"),
+    "community.comments_read": s("unsupported"),
+  },
+  linkedin_page: {
+    "post.text": s("requires_app_review", "Community Management API (w_organization_social) – Freigabe durch LinkedIn nötig", "https://learn.microsoft.com/linkedin/marketing/community-management/shares/posts-api"),
+    "post.image": s("requires_app_review", "Images API initializeUpload → PUT"),
+    "post.carousel": s("unverified", "multiImage (2–20 Bilder) – Live-Test ausstehend"),
+    "post.video": s("requires_app_review", "Videos API, mehrteiliger Upload + finalizeUpload"),
+    "post.document": s("unverified", "Documents API – noch nicht implementiert"),
+    "insights.post": s("requires_app_review", "socialActions (Likes/Kommentare); Impressionen nicht implementiert"),
+    "insights.account": s("unverified"),
+    "community.comments_read": s("requires_app_review", "socialActions/{urn}/comments"),
+    "community.comments_reply": s("requires_app_review"),
+  },
+  linkedin_profile: {
+    "post.text": s("requires_app_review", "Produkt „Share on LinkedIn“ (w_member_social, Self-Service)"),
+    "post.image": s("requires_app_review"),
+    "post.carousel": s("unverified"),
+    "post.video": s("requires_app_review"),
+    "insights.post": s("unverified", "socialActions für Mitglieder-Posts eingeschränkt"),
+    "insights.account": s("unsupported", "keine Profil-Insights per API"),
+  },
+  tiktok: {
+    "post.video": s("requires_app_review", "Content Posting API (Direct Post). Ohne Audit nur SELF_ONLY; Medien-Domain muss bei TikTok verifiziert sein", "https://developers.tiktok.com/doc/content-posting-api-reference-direct-post"),
+    "post.reel": s("requires_app_review", "als Video veröffentlicht"),
+    "post.short": s("requires_app_review", "als Video veröffentlicht"),
+    "post.image": s("requires_app_review", "Photo Mode (content/init, media_type=PHOTO)"),
+    "post.carousel": s("requires_app_review", "Photo Mode, bis 35 Bilder"),
+    "reel.thumb_offset": s("requires_app_review", "video_cover_timestamp_ms"),
+    "reel.independent_cover": s("unsupported", "TikTok erlaubt nur ein Standbild aus dem Video"),
+    "insights.post": s("requires_app_review", "video.list Scope für view/like/comment/share counts"),
+    "community.comments_read": s("unsupported", "kein Kommentar-API für Drittanbieter"),
+  },
+  youtube: {
+    "post.short": s("requires_app_review", "videos.insert (resumable); vertikal, ≤ 3 min. Ungeprüfte API-Projekte: Uploads werden auf privat gesperrt", "https://developers.google.com/youtube/v3/docs/videos/insert"),
+    "post.reel": s("requires_app_review", "als Short veröffentlicht"),
+    "post.video": s("requires_app_review", "Quota 1600 Einheiten pro Upload (Standard 10 000/Tag)"),
+    "reel.independent_cover": s("requires_app_review", "thumbnails.set – benötigt verifizierten YouTube-Kanal; Fehler brechen den Upload nicht ab"),
+    "insights.post": s("requires_app_review", "videos.list statistics"),
+    "insights.account": s("requires_app_review", "channels.list statistics"),
+    "community.comments_read": s("requires_app_review", "commentThreads.list"),
+    "community.comments_reply": s("requires_app_review", "comments.insert (youtube.force-ssl)"),
+  },
+  x: {
+    "post.text": s("requires_app_review", "X API v2 – kostenpflichtig (Pay-per-Use). Kostenhinweis im UI", "https://docs.x.com/x-api/posts/creation-of-a-post"),
+    "post.image": s("requires_app_review", "v2 media upload"),
+    "post.carousel": s("requires_app_review", "bis 4 Bilder"),
+    "post.video": s("unverified", "v2 chunked upload – Live-Test ausstehend"),
+    "post.thread": s("requires_app_review", "Antwortkette, Teile mit „---“ trennen"),
+    "insights.post": s("requires_app_review", "public_metrics; Umfang abhängig vom API-Tarif"),
+    "community.comments_read": s("unverified", "search/recent – tarifabhängig"),
+    "community.comments_reply": s("requires_app_review"),
+    "community.mentions": s("unverified", "tarifabhängig"),
+  },
+  threads: {
+    "post.text": s("requires_app_review", "Threads API (threads_content_publish)", "https://developers.facebook.com/docs/threads/posts"),
+    "post.image": s("requires_app_review"),
+    "post.video": s("requires_app_review"),
+    "post.carousel": s("requires_app_review", "2–20 Elemente"),
+    "post.thread": s("requires_app_review", "reply_to_id-Kette"),
+    "insights.post": s("requires_app_review", "threads_manage_insights"),
+    "community.comments_read": s("requires_app_review", "threads_read_replies"),
+    "community.comments_reply": s("requires_app_review", "threads_manage_replies"),
+  },
+  pinterest: {
+    "post.image": s("requires_app_review", "Pins API v5; Trial-Zugang nur Sandbox", "https://developers.pinterest.com/docs/api/v5/pins-create"),
+    "post.video": s("requires_app_review", "media register → Upload → Pin mit cover_image_url"),
+    "post.carousel": s("unverified", "multiple_image_urls – Live-Test ausstehend"),
+    "reel.independent_cover": s("requires_app_review", "Video-Pins verlangen ein eigenes Coverbild"),
+    "insights.post": s("requires_app_review", "pins/{id}/analytics"),
+    "community.comments_read": s("unsupported", "kein Kommentar-API in v5"),
+  },
+  bluesky: {
+    "post.text": s("requires_app_review", "AT Protocol createRecord; App-Passwort, keine Plattformprüfung nötig – Live-Test ausstehend", "https://docs.bsky.app/docs/advanced-guides/posts"),
+    "post.image": s("requires_app_review", "uploadBlob, max. 4 Bilder à 1 MB"),
+    "post.carousel": s("requires_app_review", "bis 4 Bilder"),
+    "post.thread": s("requires_app_review", "reply root/parent"),
+    "post.video": s("unsupported", "Video-Service noch nicht angebunden"),
+    "insights.post": s("requires_app_review", "Likes/Reposts/Antworten; keine Impressionen"),
+    "insights.account": s("requires_app_review", "Follower"),
+    "community.comments_read": s("requires_app_review", "getPostThread"),
+    "community.comments_reply": s("requires_app_review"),
+  },
+  mastodon: {
+    "post.text": s("requires_app_review", "OAuth-App pro Instanz (automatisch registriert); keine Prüfung nötig – Live-Test ausstehend", "https://docs.joinmastodon.org/methods/statuses/"),
+    "post.image": s("requires_app_review", "/api/v2/media"),
+    "post.carousel": s("requires_app_review", "bis 4 Anhänge"),
+    "post.video": s("requires_app_review"),
+    "post.thread": s("requires_app_review", "in_reply_to_id-Kette"),
+    "insights.post": s("requires_app_review", "Favoriten/Boosts/Antworten; keine Impressionen"),
+    "insights.account": s("requires_app_review", "Follower"),
+    "community.comments_read": s("requires_app_review", "statuses/{id}/context"),
+    "community.comments_reply": s("requires_app_review"),
+    "community.mentions": s("requires_app_review"),
+  },
+  google_business: {
+    "post.text": s("requires_app_review", "Business Profile API – Zugang muss bei Google beantragt werden (localPosts v4)", "https://developers.google.com/my-business/content/posts-data"),
+    "post.image": s("requires_app_review"),
+    "insights.post": s("unsupported", "Post-Metriken von Google eingestellt"),
+    "insights.account": s("unverified", "Performance API – nicht implementiert"),
+    "community.comments_read": s("requires_app_review", "Bewertungen lesen"),
+    "community.comments_reply": s("requires_app_review", "Bewertungen beantworten"),
+  },
+  substack: {
+    "post.text": s("unsupported", "keine offizielle öffentliche API für Notes bekannt – nur Benachrichtigung"),
+    "insights.account": s("unsupported"),
+  },
+  start_page: {
+    "post.text": s("supported", "eigenes Produkt"),
+    "post.image": s("supported"),
+    "post.video": s("supported"),
+    "insights.account": s("supported", "eigene Besuchs-/Klickstatistik"),
+  },
+  sandbox: Object.fromEntries(
+    [
+      "post.text",
+      "post.image",
+      "post.video",
+      "post.carousel",
+      "post.reel",
+      "post.story",
+      "reel.independent_cover",
+      "reel.thumb_offset",
+      "reel.share_to_feed",
+      "post.first_comment",
+      "insights.post",
+      "community.comments_read",
+      "community.comments_reply",
+      "insights.account",
+    ].map((k) => [k, s("supported", "SANDBOX/MOCK – kein echter Netzwerkaufruf")]),
+  ) as CapabilityMap,
+};
+
+/** A capability can be used for automatic publishing only in these states. */
+export const AUTOMATIC_STATES: CapabilityState[] = ["supported", "requires_app_review"];
+
+export function capabilityFor(platform: Platform, key: CapabilityKey): CapabilityEntry {
+  return PLATFORM_CAPABILITIES[platform][key] ?? { state: "unsupported" };
+}

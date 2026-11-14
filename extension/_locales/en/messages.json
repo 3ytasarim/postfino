@@ -1,0 +1,35 @@
+{
+  "menuPage": {
+    "message": "Send page to Postfino"
+  },
+  "menuImage": {
+    "message": "Send image to Postfino"
+  },
+  "menuSelection": {
+    "message": "Send selection to Postfino"
+  },
+  "share": {
+    "message": "Send to Postfino"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "baseLabel": {
+    "message": "Postfino address"
+  },
+  "baseHint": {
+    "message": "HTTPS only (HTTP only for localhost). No credentials are stored – you are signed in through your normal login."
+  },
+  "save": {
+    "message": "Save"
+  },
+  "saved": {
+    "message": "Saved."
+  },
+  "extName": {
+    "message": "Postfino"
+  },
+  "extDescription": {
+    "message": "Send pages, images and text selections to Postfino as ideas or posts."
+  }
+}

@@ -1,0 +1,10 @@
+:root { color-scheme: light dark; --bg: #f6f5f1; --fg: #111318; --muted: #5d6170; --accent: #0047ab; --line: #e3e1da; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0c0d10; --fg: #f2f1ed; --muted: #a3a6b1; --accent: #4f8dff; --line: #262830; } }
+body { margin: 0; width: 300px; padding: 14px; font: 14px/1.4 system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.title { font-weight: 600; margin: 0 0 4px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.url { margin: 0 0 12px; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+button.primary { width: 100%; min-height: 44px; border: 0; border-radius: 12px; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; }
+@media (prefers-color-scheme: dark) { button.primary { color: #111318; } }
+button.primary:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+a { display: block; margin-top: 10px; text-align: center; color: var(--muted); font-size: 12px; }

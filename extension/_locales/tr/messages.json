@@ -1,0 +1,35 @@
+{
+  "menuPage": {
+    "message": "Sayfayı Postfino'ya gönder"
+  },
+  "menuImage": {
+    "message": "Görseli Postfino'ya gönder"
+  },
+  "menuSelection": {
+    "message": "Seçimi Postfino'ya gönder"
+  },
+  "share": {
+    "message": "Postfino'ya gönder"
+  },
+  "settings": {
+    "message": "Ayarlar"
+  },
+  "baseLabel": {
+    "message": "Postfino adresi"
+  },
+  "baseHint": {
+    "message": "Yalnızca HTTPS (HTTP yalnızca localhost için). Giriş bilgisi saklanmaz – normal oturumunla girişlisin."
+  },
+  "save": {
+    "message": "Kaydet"
+  },
+  "saved": {
+    "message": "Kaydedildi."
+  },
+  "extName": {
+    "message": "Postfino"
+  },
+  "extDescription": {
+    "message": "Sayfaları, görselleri ve metin seçimlerini Postfino'ya fikir veya gönderi olarak gönder."
+  }
+}
