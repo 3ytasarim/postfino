@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --color-ink: #0b1020;
+  --color-ink-2: #3c4458;
+  --color-ink-3: #6b7388;
+  --color-line: #e3e8f2;
+  --color-paper: #f6f8fc;
+  --color-cobalt: #0047ab;
+  --color-cobalt-2: #1d5bd8;
+  --color-sky: #4f8dff;
+  --color-lilac: #7c6cf0;
+  --color-mint: #19c39c;
+  --color-surface: #ffffff;
+  --color-surface-2: #eef2f9;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: light;
+  --navy: #070d24;
+}
+
+html {
+  scroll-behavior: auto; /* Lenis handles smooth scrolling */
+}
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+::selection {
+  background: #c9dbff;
+}
+:focus-visible {
+  outline: 2px solid var(--color-cobalt-2);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* ── Lenis ── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+/* ── Animated aurora (hero / dark sections) ── */
+.aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.aurora i {
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.55;
+  will-change: transform;
+}
+.aurora i:nth-child(1) { background: #3b82f6; top: -28vmax; left: -14vmax; animation: auA 26s ease-in-out infinite alternate; }
+.aurora i:nth-child(2) { background: #7c6cf0; top: -10vmax; right: -22vmax; animation: auB 32s ease-in-out infinite alternate; }
+.aurora i:nth-child(3) { background: #22d3ee; bottom: -36vmax; left: 20vmax; opacity: 0.35; animation: auC 38s ease-in-out infinite alternate; }
+.aurora.soft i { opacity: 0.28; }
+@keyframes auA { to { transform: translate(26vmax, 16vmax) scale(1.15); } }
+@keyframes auB { to { transform: translate(-22vmax, 14vmax) scale(0.9); } }
+@keyframes auC { to { transform: translate(-10vmax, -24vmax) scale(1.2); } }
+
+/* ── Glass surfaces ── */
+.glass {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 24px 60px -24px rgba(16, 40, 110, 0.28);
+  backdrop-filter: blur(28px) saturate(170%);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+}
+.glass-dark {
+  background: rgba(12, 18, 44, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+}
+
+/* ── Marquee ── */
+.marquee {
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* ── Spotlight card (pointer-follow glow) ── */
+.spot {
+  position: relative;
+  isolation: isolate;
+}
+.spot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 300ms;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(79, 141, 255, 0.16), transparent 60%);
+}
+.spot:hover::before {
+  opacity: 1;
+}
+
+/* ── Wordmark ── */
+.logo-pill {
+  transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+a:hover .logo-pill {
+  transform: translateY(-1px) scale(1.06);
+}
+
+/* ── Misc motion ── */
+.float-slow { animation: floatSlow 7s ease-in-out infinite; }
+@keyframes floatSlow { 50% { transform: translateY(-10px); } }
+.shine {
+  background: linear-gradient(110deg, #0b1020 30%, #1d5bd8 45%, #7c6cf0 55%, #0b1020 70%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 7s linear infinite;
+}
+@keyframes shine { to { background-position: -250% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Orbit ── */
+.orbit-ring { animation: orbitSpin linear infinite; }
+@keyframes orbitSpin { to { transform: rotate(360deg); } }
+.orbit-ping { animation: orbitPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite; }
+@keyframes orbitPing { 0% { transform: scale(1); opacity: 0.9; } 100% { transform: scale(1.9); opacity: 0; } }
+.ping-ring { animation: orbitPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+/* ── Legal pages ── */
+.legal { color: var(--color-ink-2); line-height: 1.75; }
+.legal h2 { margin-top: 2.5rem; font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; color: var(--color-ink); }
+.legal h3 { margin-top: 1.5rem; font-weight: 700; color: var(--color-ink); }
+.legal p, .legal ul, .legal ol { margin-top: 0.75rem; }
+.legal ul { list-style: disc; padding-left: 1.25rem; }
+.legal ol { list-style: decimal; padding-left: 1.25rem; }
+.legal li + li { margin-top: 0.35rem; }
+.legal a { color: var(--color-cobalt); text-decoration: underline; text-underline-offset: 3px; }
