@@ -5,7 +5,7 @@ import { authorize } from "./tenancy";
 import { getPost, decideApproval } from "./posts";
 import { audit } from "./audit";
 import type { Actor } from "./rbac";
-import type { Mailer } from "./mailer";
+import { mailTemplates, type Mailer } from "./mailer";
 import type { StorageDriver } from "./storage";
 
 // Collaboration: client review portal (token link, no account), internal notes with
@@ -188,9 +188,9 @@ export async function sendApprovalReminders(db: Db, mailer: Mailer | null, appUr
       link: `/app/posts/${req.postId}`,
     });
     if (mailer?.configured && ids.length) {
-      const users = await db.select({ email: schema.users.email, prefs: schema.users.notificationPrefs }).from(schema.users).where(inArray(schema.users.id, ids));
+      const users = await db.select({ email: schema.users.email, locale: schema.users.locale, prefs: schema.users.notificationPrefs }).from(schema.users).where(inArray(schema.users.id, ids));
       for (const u of users.filter((x) => x.prefs.approvalEmails !== false))
-        await mailer.send({ to: u.email, subject: "Freigabe ausstehend – Postfino", text: `Ein Beitrag wartet auf deine Freigabe:\n\n${caption.slice(0, 300)}\n\n${appUrl}/app/posts/${req.postId}` });
+        await mailer.send({ to: u.email, ...mailTemplates.approvalPending(u.locale, caption.length > 300 ? `${caption.slice(0, 300)}…` : caption, `${appUrl}/app/posts/${req.postId}`) });
     }
     await db.update(schema.approvalRequests).set({ remindedAt: now }).where(eq(schema.approvalRequests.id, req.id));
     sent++;
