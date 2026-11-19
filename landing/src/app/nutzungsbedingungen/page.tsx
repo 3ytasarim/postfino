@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
-import { LEGAL_V2 } from "@/lib/legal";
+import { LEGAL_V2, OPERATOR } from "@/lib/legal";
 import Link from "next/link";
 import { LegalPage, Todo } from "@/components/legal-page";
-import { COMPANY, CONTACT_EMAIL } from "@/lib/site";
+import { COMPANY } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Nutzungsbedingungen",
@@ -58,7 +58,7 @@ export default function Page() {
 
       <h2>10. Schlussbestimmungen</h2>
       <p>
-        Es gilt das Recht von <Todo>Rechtswahl / Gerichtsstand</Todo>. Fragen: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        Es gilt das Recht von <Todo>Rechtswahl / Gerichtsstand</Todo>. Fragen: <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>
       </p>
     </LegalPage>
   );

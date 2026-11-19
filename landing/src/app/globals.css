@@ -7,7 +7,7 @@
   --font-display: var(--font-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --color-ink: #0b1020;
   --color-ink-2: #3c4458;
-  --color-ink-3: #6b7388;
+  --color-ink-3: #5f677c;
   --color-line: #e3e8f2;
   --color-paper: #f6f8fc;
   --color-cobalt: #0047ab;
@@ -448,3 +448,15 @@ html.dark .steps-band { background: #070d24; border-block: 1px solid rgba(255, 2
 @keyframes mbSweep { 0% { transform: translateX(-120%); } 35%, 100% { transform: translateX(120%); } }
 @keyframes mbWave { 0%, 14%, 100% { transform: none; color: inherit; } 5% { transform: translateY(-.16em); color: var(--mb-blue); } }
 @media (prefers-reduced-motion: reduce) { .madeby::after, .madeby-mark > span { animation: none; } }
+
+/* hero intro in plain CSS: runs from the first paint instead of waiting for hydration (the text is the LCP element) */
+@keyframes heroRise { from { opacity: 0; transform: translateY(12px); } }
+@keyframes heroWord { from { opacity: 0; transform: translateY(40px); filter: blur(10px); } }
+@keyframes heroLift { from { transform: translateY(14px); } }
+.hero-rise { animation: heroRise .7s cubic-bezier(.16, 1, .3, 1) both; }
+.hero-word { animation: heroWord .8s cubic-bezier(.16, 1, .3, 1) both; }
+.hero-lift { animation: heroLift .7s cubic-bezier(.16, 1, .3, 1) both; }
+@media (prefers-reduced-motion: reduce) { .hero-rise, .hero-word, .hero-lift { animation: none; } }
+
+/* sections off screen keep their looping decorations still (see AnimGate) */
+.anim-off, .anim-off *, .anim-off *::before, .anim-off *::after { animation-play-state: paused !important; }

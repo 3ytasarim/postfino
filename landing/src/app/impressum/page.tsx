@@ -1,14 +1,24 @@
 import type { Metadata } from "next";
-import { LEGAL_V2 } from "@/lib/legal";
+import { JsonLd, pageMeta, subPageLd } from "@/lib/seo";
+import { LEGAL_V2, OPERATOR } from "@/lib/legal";
 import { ImpressumV2 } from "@/components/legal-v2";
 import { LegalPage, Todo } from "@/components/legal-page";
-import { COMPANY, CONTACT_EMAIL, SITE_URL } from "@/lib/site";
+import { COMPANY, SITE_URL } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Impressum", description: `Anbieterkennzeichnung für Postfino, eine Anwendung der ${COMPANY}.`, alternates: { canonical: "/impressum" } };
+const TITLE = "Impressum";
+const DESCRIPTION = "Anbieterkennzeichnung von Postfino (postfino.com), einer Anwendung der Bleibsichtbar LLC: Anschrift, Vertretung, Kontakt und Verantwortlichkeit.";
+export const metadata: Metadata = pageMeta("/impressum", TITLE, DESCRIPTION);
 
 export default function Page() {
-  if (LEGAL_V2) return <ImpressumV2 />;
+  if (LEGAL_V2) return (
+      <>
+        <JsonLd data={subPageLd("/impressum", TITLE, DESCRIPTION)} />
+        <ImpressumV2 />
+      </>
+    );
   return (
+    <>
+    <JsonLd data={subPageLd("/impressum", TITLE, DESCRIPTION)} />
     <LegalPage title="Impressum" updated="14. November 2026">
       <h2>Anbieter</h2>
       <p>
@@ -26,7 +36,7 @@ export default function Page() {
       </p>
       <h2>Kontakt</h2>
       <p>
-        E-Mail: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        E-Mail: <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>
         <br />
         Telefon: <Todo>Telefonnummer</Todo>
       </p>
@@ -49,5 +59,6 @@ export default function Page() {
       <h2>Marken</h2>
       <p>Instagram, Facebook, Threads, LinkedIn, TikTok, YouTube, X, Pinterest, Bluesky, Mastodon und Google sind Marken ihrer jeweiligen Inhaber. Postfino steht in keiner Verbindung zu diesen Unternehmen und wird von ihnen nicht gesponsert.</p>
     </LegalPage>
+    </>
   );
 }

@@ -18,11 +18,10 @@ export function MadeBy({
   suf?: string;
   className?: string;
 }) {
-  const label = [pre, "Bleibsichtbar", suf].filter(Boolean).join(" ");
   return (
-    <a href="https://bleibsichtbar.com" target="_blank" rel="noopener" aria-label={label} data-tone={tone} data-size={size} className={`madeby ${className}`}>
-      {pre && <span className="madeby-pre" aria-hidden>{pre}</span>}
-      <span className="madeby-mark" aria-hidden>
+    <a href="https://bleibsichtbar.com" target="_blank" rel="noopener" data-tone={tone} data-size={size} className={`madeby ${className}`}>
+      {pre && <span className="madeby-pre">{pre}</span>}{" "}
+      <span className="madeby-mark">
         {WORD.split("").map((c, i) => (
           <span key={i} style={{ "--i": i } as React.CSSProperties}>
             {c}
@@ -30,7 +29,7 @@ export function MadeBy({
         ))}
         <span className="madeby-dot" />
       </span>
-      {suf && <span className="madeby-pre" aria-hidden>{suf}</span>}
+      {suf && <span className="madeby-pre">{suf}</span>}
     </a>
   );
 }

@@ -1,42 +1,55 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit, Space_Grotesk } from "next/font/google";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { AnimGate } from "@/components/anim-gate";
 import "./globals.css";
-import { COMPANY, CONTACT_EMAIL, SITE_URL } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
+import { HOME_DESCRIPTION, HOME_TITLE, JsonLd, ORGANIZATION, ORG_ID, SITE_ID } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const grotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-grotesk", display: "swap" });
 const outfit = Outfit({ subsets: ["latin"], weight: ["600"], variable: "--font-outfit", display: "swap" });
 
-const title = "Postfino – Social-Media-Planung für Marken & Agenturen";
-const description =
-  "Plane, prüfe und veröffentliche Beiträge für Instagram, Facebook, LinkedIn, TikTok, YouTube und mehr – an einem Ort. Mit Kalender, Ideen-Board, Community-Postfach, Insights und Freigaben im Team.";
+const title = HOME_TITLE;
+const description = HOME_DESCRIPTION;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: title, template: "%s · Postfino" },
   description,
   applicationName: "Postfino",
-  openGraph: { title, description, type: "website", locale: "de_DE", siteName: "Postfino", url: "/" },
+  authors: [{ name: "Bleibsichtbar LLC", url: SITE_URL }],
+  publisher: "Bleibsichtbar LLC",
+  category: "Software",
+  keywords: ["Social-Media-Planung", "Social-Media-Tool", "Beiträge planen", "Instagram planen", "Redaktionsplan", "Content-Kalender", "Social-Media-Management", "Agentur-Tool", "DSGVO"],
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
+  openGraph: { title, description, type: "website", locale: "de_DE", siteName: "Postfino" },
   twitter: { card: "summary_large_image", title, description },
-  alternates: { canonical: "/" },
+  formatDetection: { telephone: false, email: false, address: false },
 };
 export const viewport: Viewport = { themeColor: "#0047ab" };
 
-// Structured data: describes the product honestly (no ratings/reviews are claimed).
+// Structured data: describes the product honestly (no ratings/reviews are claimed); prices match the pricing section.
+const PLANS = [["Starter", "19"], ["Pro", "59"], ["Agency", "149"]] as const;
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "Organization", "@id": `${SITE_URL}/#org`, name: COMPANY, url: SITE_URL, email: CONTACT_EMAIL, brand: { "@type": "Brand", name: "Postfino" } },
+    ORGANIZATION,
+    { "@type": "WebSite", "@id": SITE_ID, url: SITE_URL, name: "Postfino", description, inLanguage: "de-DE", publisher: { "@id": ORG_ID } },
     {
       "@type": "SoftwareApplication",
+      "@id": `${SITE_URL}/#app`,
       name: "Postfino",
       url: SITE_URL,
-      publisher: { "@id": `${SITE_URL}/#org` },
+      image: `${SITE_URL}/opengraph-image.png`,
+      publisher: { "@id": ORG_ID },
       applicationCategory: "BusinessApplication",
+      applicationSubCategory: "Social-Media-Management",
       operatingSystem: "Web",
+      inLanguage: "de-DE",
       description,
-      offers: { "@type": "AggregateOffer", priceCurrency: "EUR", lowPrice: "19", highPrice: "149" },
+      featureList: ["Redaktionskalender", "Ideen-Board", "Automatisches Veröffentlichen", "Community-Postfach", "Insights und Berichte", "Freigaben im Team", "Kunden-Workspaces für Agenturen", "KI-Textvorschläge", "Zwei-Faktor-Anmeldung"],
+      offers: PLANS.map(([name, price]) => ({ "@type": "Offer", name, price, priceCurrency: "EUR", category: "subscription", url: `${SITE_URL}/#preise` })),
     },
   ],
 };
@@ -51,11 +64,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
       <body>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <JsonLd data={jsonLd} />
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2">
           Zum Inhalt springen
         </a>
         <SmoothScroll />
+        <AnimGate />
         {children}
       </body>
     </html>

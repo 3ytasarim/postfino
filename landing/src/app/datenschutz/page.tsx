@@ -1,19 +1,25 @@
 import type { Metadata } from "next";
-import { LEGAL_V2 } from "@/lib/legal";
+import { JsonLd, pageMeta, subPageLd } from "@/lib/seo";
+import { LEGAL_V2, OPERATOR } from "@/lib/legal";
 import { DatenschutzV2 } from "@/components/legal-v2";
 import Link from "next/link";
 import { LegalPage, Todo } from "@/components/legal-page";
-import { COMPANY, CONTACT_EMAIL } from "@/lib/site";
+import { COMPANY } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Datenschutzerklärung",
-  description: "Welche Daten Postfino verarbeitet, wofür, wie lange und welche Rechte du hast – inklusive der Daten aus verbundenen Social-Media-Konten.",
-  alternates: { canonical: "/datenschutz" },
-};
+const TITLE = "Datenschutzerklärung";
+const DESCRIPTION = "Welche Daten Postfino verarbeitet, wofür, wie lange und welche Rechte du nach DSGVO hast – inklusive der Daten aus verbundenen Social-Media-Konten.";
+export const metadata: Metadata = pageMeta("/datenschutz", TITLE, DESCRIPTION);
 
 export default function Page() {
-  if (LEGAL_V2) return <DatenschutzV2 />;
+  if (LEGAL_V2) return (
+      <>
+        <JsonLd data={subPageLd("/datenschutz", TITLE, DESCRIPTION)} />
+        <DatenschutzV2 />
+      </>
+    );
   return (
+    <>
+    <JsonLd data={subPageLd("/datenschutz", TITLE, DESCRIPTION)} />
     <LegalPage title="Datenschutzerklärung" updated="14. November 2026">
       <p>
         Diese Erklärung beschreibt, wie Postfino personenbezogene Daten verarbeitet – auf dieser Website und in der Web-Anwendung. Postfino ist eine Anwendung der {COMPANY}.
@@ -23,7 +29,7 @@ export default function Page() {
       <p>
         {COMPANY}, <Todo>Anschrift</Todo>
         <br />
-        E-Mail: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        E-Mail: <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>
       </p>
 
       <h2>2. Welche Daten wir verarbeiten</h2>
@@ -86,7 +92,7 @@ export default function Page() {
       <h2>8. Deine Rechte</h2>
       <p>
         Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO) sowie das Recht, eine erteilte Einwilligung jederzeit zu
-        widerrufen. Schreib uns dazu an <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren.
+        widerrufen. Schreib uns dazu an <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>. Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren.
       </p>
 
       <h2>9. Sicherheit</h2>
@@ -95,5 +101,6 @@ export default function Page() {
       <h2>10. Änderungen</h2>
       <p>Wir passen diese Erklärung an, wenn sich Funktionen oder Rechtslage ändern. Es gilt die jeweils hier veröffentlichte Fassung.</p>
     </LegalPage>
+    </>
   );
 }

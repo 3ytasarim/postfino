@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Nav } from "@/components/nav";
 import { Hero } from "@/components/hero";
 import { Networks } from "@/components/networks";
@@ -10,6 +11,13 @@ import { Faq } from "@/components/faq";
 import { FinalCta } from "@/components/final-cta";
 import { Footer } from "@/components/footer";
 import { FAQ } from "@/lib/faq";
+import { HOME_DESCRIPTION, HOME_TITLE, JsonLd } from "@/lib/seo";
+
+// Home only: canonical and og:url live here so the 404 page does not inherit them.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: { type: "website", locale: "de_DE", siteName: "Postfino", url: "/", title: HOME_TITLE, description: HOME_DESCRIPTION },
+};
 
 const faqLd = {
   "@context": "https://schema.org",
@@ -33,7 +41,7 @@ export default function Home() {
         <FinalCta />
       </main>
       <Footer />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      <JsonLd data={faqLd} />
     </>
   );
 }

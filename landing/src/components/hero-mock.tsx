@@ -1,4 +1,5 @@
 "use client";
+import { useReady } from "@/lib/use-ready";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import { CalendarDays, Check, Clock3, Home, ImageIcon, Lightbulb, LineChart, MessagesSquare, MousePointer2, Plus, Sparkles, X } from "lucide-react";
@@ -38,6 +39,7 @@ const STEPS: { ms: number; at: string; click?: boolean }[] = [
 const S = { add: 2, ig: 4, li: 5, type: 5, time: 7, plan: 8, publish: 9, done: 10 } as const;
 
 export function HeroMock() {
+  const ready = useReady();
   const frame = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(0);
   const [run, setRun] = useState(false);
@@ -73,10 +75,10 @@ export function HeroMock() {
   }, []);
 
   useEffect(() => {
-    if (!run) return;
+    if (!run || !ready) return;
     const id = window.setTimeout(() => setStep((s) => (s + 1) % STEPS.length), step === 0 && !pos.ok ? 1800 : STEPS[step].ms);
     return () => window.clearTimeout(id);
-  }, [run, step, pos.ok]);
+  }, [run, ready, step, pos.ok]);
 
   // typing runs inside its step; outside it the draft is either empty or complete
   useEffect(() => {
@@ -243,7 +245,7 @@ export function HeroMock() {
                       {step >= S.time ? "Do · 18:00" : "Zeitpunkt"}
                     </span>
                     <ImageIcon className="size-4 text-ink-3" />
-                    <span data-t="plan" className={`ml-auto rounded-full px-3.5 py-1.5 text-[0.7rem] font-semibold transition-colors duration-300 ${step >= S.time ? "bg-cobalt text-white" : "bg-cobalt/30 text-white"}`}>
+                    <span data-t="plan" className={`ml-auto rounded-full px-3.5 py-1.5 text-[0.7rem] font-semibold transition-colors duration-300 ${step >= S.time ? "bg-cobalt text-white" : "bg-cobalt/10 text-cobalt-2"}`}>
                       Planen
                     </span>
                   </div>

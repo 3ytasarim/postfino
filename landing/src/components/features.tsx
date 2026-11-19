@@ -1,5 +1,5 @@
 "use client";
-import type { PointerEvent, ReactNode } from "react";
+import { useRef, type PointerEvent, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useTick } from "@/lib/use-tick";
 import { BarChart3, CalendarClock, Code2, Inbox, Lightbulb, Link2, Palette, Sparkles, Users, Wand2 } from "lucide-react";
@@ -40,11 +40,12 @@ const WEEK = [
 
 /** Week strip: a pill glides from day to day, that day's posts slide in as cards. */
 function MiniCalendar() {
-  const t = useTick(2600);
+  const box = useRef<HTMLDivElement>(null);
+  const t = useTick(2600, 0, box);
   const day = t % WEEK.length;
   const cur = WEEK[day];
   return (
-    <div className="rounded-[22px] bg-gradient-to-br from-[var(--mock-a)] via-surface to-[var(--mock-b)] p-3 ring-1 ring-line" aria-hidden>
+    <div ref={box} className="rounded-[22px] bg-gradient-to-br from-[var(--mock-a)] via-surface to-[var(--mock-b)] p-3 ring-1 ring-line" aria-hidden>
       <div className="grid grid-cols-7 gap-1 rounded-2xl bg-surface/80 p-1 ring-1 ring-line">
         {WEEK.map((w, i) => (
           <div key={w.d} className="relative flex flex-col items-center rounded-xl py-2">
@@ -90,7 +91,8 @@ function MiniCalendar() {
 }
 
 function MiniChart() {
-  const t = useTick(2600);
+  const box = useRef<SVGSVGElement>(null);
+  const t = useTick(2600, 0, box);
   const sets = [
     [18, 26, 22, 34, 30, 44, 40, 56, 52, 66],
     [22, 20, 30, 28, 40, 36, 50, 48, 60, 58],
@@ -99,7 +101,7 @@ function MiniChart() {
   const pts = sets[t % sets.length];
   const d = pts.map((v, i) => `${i === 0 ? "M" : "L"}${(i / (pts.length - 1)) * 300},${80 - v}`).join(" ");
   return (
-    <svg viewBox="0 0 300 84" className="w-full" aria-hidden>
+    <svg ref={box} viewBox="0 0 300 84" className="w-full" aria-hidden>
       <defs>
         <linearGradient id="fc" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0" stopColor="#1d5bd8" stopOpacity=".25" />
@@ -123,10 +125,11 @@ const MSGS = [
 ] as const;
 
 function MiniInbox() {
-  const t = useTick(2000);
+  const box = useRef<HTMLUListElement>(null);
+  const t = useTick(2000, 0, box);
   const rows = [0, 1, 2].map((k) => MSGS[(t + MSGS.length - k) % MSGS.length]);
   return (
-    <ul className="space-y-2" aria-hidden>
+    <ul ref={box} className="space-y-2" aria-hidden>
       <AnimatePresence initial={false} mode="popLayout">
         {rows.map(([p, text], i) => (
           <motion.li layout key={text} className="flex items-center gap-2.5 rounded-2xl bg-paper px-3 py-2.5 ring-1 ring-line" initial={{ opacity: 0, y: -24, scale: 0.92 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ type: "spring", stiffness: 340, damping: 28 }}>

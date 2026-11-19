@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Check } from "lucide-react";
 import { NetworkIcon, NETWORK_NAMES } from "./network-icon";
@@ -48,7 +48,8 @@ function Ring({ items, radius, duration, reverse = false, size, active, done }: 
 
 /** Postfino hub in the middle: each beat it sends a post to one network, shows progress, then confirms it. */
 export function Orbit() {
-  const t = useTick(STEP_MS);
+  const box = useRef<HTMLDivElement>(null);
+  const t = useTick(STEP_MS, 0, box);
   const p = ORDER[t % ORDER.length];
   const [done, setDone] = useState(false);
   useEffect(() => {
@@ -58,7 +59,7 @@ export function Orbit() {
   }, [t]);
 
   return (
-    <div className="relative mx-auto aspect-square w-full max-w-[520px]" aria-hidden>
+    <div ref={box} className="relative mx-auto aspect-square w-full max-w-[520px]" aria-hidden>
       <div className="absolute inset-[18%] rounded-full bg-[radial-gradient(circle,rgba(79,141,255,0.22),transparent_70%)]" />
       <div className="absolute inset-0 origin-center scale-[0.66] sm:scale-100">
         <div className="absolute top-1/2 left-1/2 size-[520px] -translate-x-1/2 -translate-y-1/2">
