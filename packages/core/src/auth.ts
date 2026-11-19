@@ -22,14 +22,40 @@ export async function registerUser(db: Db, p: { email: string; name: string; pas
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new AppError("VALIDATION_FAILED", "invalid_email");
   const policy = validatePasswordPolicy(p.password);
   if (policy) throw new AppError("VALIDATION_FAILED", policy);
-  const [existing] = await db.select({ id: schema.users.id }).from(schema.users).where(sql`lower(${schema.users.email}) = ${email}`);
-  if (existing) throw new AppError("CONFLICT", "email_taken");
+  const [existing] = await db.select().from(schema.users).where(sql`lower(${schema.users.email}) = ${email}`);
+  if (existing) {
+    // A sign-up that never got past the email code is not an account yet: registering again restarts it (new name and
+    // password, old codes/sessions void) instead of locking the address forever. Safe because nothing is reachable
+    // before the mailbox is proven, and the new code again only goes to that mailbox.
+    if (!(await isAbandonedSignup(db, existing))) throw new AppError("CONFLICT", "email_taken");
+    const [user] = await db.transaction(async (tx) => {
+      await tx.delete(schema.loginChallenges).where(eq(schema.loginChallenges.userId, existing.id));
+      await tx.delete(schema.sessions).where(eq(schema.sessions.userId, existing.id));
+      await tx.delete(schema.passwordResetTokens).where(eq(schema.passwordResetTokens.userId, existing.id));
+      return tx
+        .update(schema.users)
+        .set({ email, name: p.name.trim(), passwordHash: await hashPassword(p.password), locale: p.locale ?? existing.locale, failedLoginCount: 0, lockedUntil: null, updatedAt: new Date() })
+        .where(eq(schema.users.id, existing.id))
+        .returning();
+    });
+    await audit(db, { organizationId: null, actorType: "user", actorUserId: user!.id, action: "user.registration_restarted", targetType: "user", targetId: user!.id });
+    return user!;
+  }
   const [user] = await db
     .insert(schema.users)
     .values({ email, name: p.name.trim(), passwordHash: await hashPassword(p.password), locale: p.locale ?? "de" })
     .returning();
   await audit(db, { organizationId: null, actorType: "user", actorUserId: user!.id, action: "user.registered", targetType: "user", targetId: user!.id });
   return user!;
+}
+
+/** Unconfirmed email, never deleted, no team and no Google/Apple identity: a sign-up that was started but not finished. */
+async function isAbandonedSignup(db: Db, u: typeof schema.users.$inferSelect) {
+  if (u.emailVerifiedAt || u.deletedAt || u.isSuperAdmin) return false;
+  const [m] = await db.select({ id: schema.memberships.id }).from(schema.memberships).where(eq(schema.memberships.userId, u.id)).limit(1);
+  if (m) return false;
+  const [i] = await db.select({ id: schema.userIdentities.id }).from(schema.userIdentities).where(eq(schema.userIdentities.userId, u.id)).limit(1);
+  return !i;
 }
 
 export async function login(db: Db, p: { email: string; password: string; ip?: string; userAgent?: string }) {
