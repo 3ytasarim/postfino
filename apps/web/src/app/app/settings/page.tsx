@@ -118,7 +118,7 @@ export default async function SettingsPage() {
       </section>
       <section id="konto-loeschen" className="card mt-6 border border-bad/30 p-6">
         <h2 className="mb-3 text-lg font-bold text-bad">{t.accountDelete.title}</h2>
-        <DeleteAccount t={t.accountDelete} plan={deletion} hasPassword={Boolean(ctx.user.passwordHash)} />
+        <DeleteAccount t={t.accountDelete} plan={deletion} hasPassword={Boolean(ctx.user.passwordHash)} toggle={{ show: t.auth.showPassword, hide: t.auth.hidePassword }} />
       </section>
     </>
   );

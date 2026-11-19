@@ -2,6 +2,7 @@
 import { useActionState } from "react";
 import { deleteAccountAction } from "@/app/app/actions-account";
 import type { Messages } from "@/i18n/de";
+import { PasswordInput } from "./password-input";
 
 type Org = { id: string; name: string };
 type Plan = { deleteOrganizations: Org[]; leaveOrganizations: Org[]; blockedByOwnership: Org[]; blockedBySubscription: Org[] };
@@ -14,7 +15,7 @@ const ERRORS: Record<string, keyof Messages["accountDelete"]> = {
   check: "errCheck",
 };
 
-export function DeleteAccount({ t, plan, hasPassword }: { t: Messages["accountDelete"]; plan: Plan; hasPassword: boolean }) {
+export function DeleteAccount({ t, plan, hasPassword, toggle }: { t: Messages["accountDelete"]; plan: Plan; hasPassword: boolean; toggle?: { show: string; hide: string } }) {
   const [state, action, pending] = useActionState(deleteAccountAction, undefined);
   const blocked = plan.blockedByOwnership.length > 0 || plan.blockedBySubscription.length > 0;
   const list = (title: string, orgs: Org[], tone = "text-ink-2") =>
@@ -41,7 +42,13 @@ export function DeleteAccount({ t, plan, hasPassword }: { t: Messages["accountDe
             <label className="label" htmlFor="del-confirm-input">
               {hasPassword ? t.password : t.email}
             </label>
-            <input id="del-confirm-input" name={hasPassword ? "password" : "email"} type={hasPassword ? "password" : "email"} autoComplete={hasPassword ? "current-password" : "email"} required className="input max-w-sm" />
+            <div className="max-w-sm">
+              {hasPassword ? (
+                <PasswordInput id="del-confirm-input" name="password" autoComplete="current-password" required showLabel={toggle?.show} hideLabel={toggle?.hide} />
+              ) : (
+                <input id="del-confirm-input" name="email" type="email" autoComplete="email" required className="input" />
+              )}
+            </div>
           </div>
           <label className="flex items-start gap-2 text-sm text-ink-2">
             <input type="checkbox" name="confirm" required className="mt-0.5 size-4 accent-[var(--bad)]" />

@@ -10,6 +10,7 @@ export default async function ResetPage({ params }: { params: Promise<{ token: s
     <>
       <h2 className="mb-8 text-3xl font-bold">{t.auth.forgotTitle}</h2>
       <AuthForm
+        passwordToggle={{ show: t.auth.showPassword, hide: t.auth.hidePassword }}
         action={resetAction}
         submit={t.common.save}
         errors={{ invalid: t.errors.generic, tokenInvalid: t.auth.tokenInvalid, passwordPolicy: t.auth.passwordPolicy }}

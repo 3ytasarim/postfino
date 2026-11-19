@@ -6,6 +6,7 @@ import { NetworkIcon } from "./network-icon";
 import { Logo } from "./logo";
 import { connectPlatformAction, connectBlueskyAction, connectSandboxAction, createManualChannelAction } from "@/app/app/actions";
 import type { Messages } from "@/i18n/de";
+import { PasswordInput } from "./password-input";
 
 type Mode = "oauth" | "bluesky" | "mastodon" | "manual" | "unavailable";
 type Variant = { platform: string; label: string; mode: Mode; note?: string };
@@ -274,7 +275,7 @@ export function ConnectChannelDialog({ open, onClose, configured, sandbox, l }: 
                   <label className="label" htmlFor="cc-pw">
                     {l.appPassword}
                   </label>
-                  <input id="cc-pw" name="password" type="password" className="input" placeholder="xxxx-xxxx-xxxx-xxxx" autoComplete="off" required pattern="[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}" />
+                  <PasswordInput id="cc-pw" name="password" className="input" placeholder="xxxx-xxxx-xxxx-xxxx" autoComplete="off" required pattern="[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}" />
                   <p className="text-xs text-ink-3">{l.appPasswordHint}</p>
                   {bsky?.error && (
                     <p role="alert" className="text-sm font-medium text-bad">

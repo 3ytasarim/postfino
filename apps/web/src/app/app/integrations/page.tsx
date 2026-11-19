@@ -5,6 +5,7 @@ import { UnsplashSearch } from "@/components/unsplash-search";
 import { getMessages } from "@/i18n";
 import { requireContext } from "@/lib/server";
 import { connectBitlyAction, disconnectIntegrationAction } from "../actions-links";
+import { PasswordInput } from "@/components/password-input";
 
 export const metadata = { title: "Integrationen" };
 
@@ -49,7 +50,7 @@ export default async function IntegrationsPage() {
                           </form>
                         ) : (
                           <FormAction action={connectBitlyAction} submit={it.connect} className="space-y-2" submitClassName="btn btn-primary !min-h-[36px] text-xs">
-                            <input name="token" type="password" autoComplete="off" className="input" placeholder={it.bitlyToken} aria-label={it.bitlyToken} required />
+                            <PasswordInput name="token" autoComplete="off" placeholder={it.bitlyToken} aria-label={it.bitlyToken} required showLabel={t.auth.showPassword} hideLabel={t.auth.hidePassword} />
                             <p className="text-xs text-ink-3">{it.bitlyHelp}</p>
                           </FormAction>
                         )}

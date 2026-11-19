@@ -196,13 +196,13 @@ async function activeChallenge(db: Db, token: string) {
   return row ?? null;
 }
 
-/** For the code page: which (masked) address the code went to, and when a resend is possible. */
+/** For the code page: which address the code went to (shown in full – the person just typed it; a masked
+ *  "sy•@…" read like a typo for short addresses), and when a resend is possible. */
 export async function describeLoginChallenge(db: Db, token: string | undefined) {
   if (!token) return null;
   const row = await activeChallenge(db, token);
   if (!row) return null;
-  const [local = "", domain = ""] = row.user.email.split("@");
-  return { email: `${local.slice(0, 2)}${"•".repeat(Math.max(1, local.length - 2))}@${domain}`, resendAt: new Date(row.ch.lastSentAt.getTime() + RESEND_AFTER_MS), expiresAt: row.ch.expiresAt };
+  return { email: row.user.email, resendAt: new Date(row.ch.lastSentAt.getTime() + RESEND_AFTER_MS), expiresAt: row.ch.expiresAt };
 }
 
 export async function resendLoginChallenge(db: Db, mailer: Mailer, token: string, p: { provider?: string; ip?: string; revealCode?: boolean }) {

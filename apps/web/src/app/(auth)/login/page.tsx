@@ -24,6 +24,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </p>
       )}
       <AuthForm
+        passwordToggle={{ show: a.showPassword, hide: a.hidePassword }}
         action={loginAction}
         submit={a.login}
         errors={{ invalid: a.invalid, locked: a.locked }}
@@ -43,6 +44,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const registerForm = (
     <>
       <AuthForm
+        passwordToggle={{ show: a.showPassword, hide: a.hidePassword }}
         action={registerAction}
         submit={a.register}
         errors={{ invalid: a.invalid, emailTaken: a.emailTaken, passwordPolicy: a.passwordPolicy }}

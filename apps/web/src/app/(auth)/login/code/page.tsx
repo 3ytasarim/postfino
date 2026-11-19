@@ -18,6 +18,8 @@ export default async function CodePage() {
   const jar = await cookies();
   const info = await describeLoginChallenge(services().db, jar.get(CHALLENGE_COOKIE)?.value);
   const devCode = jar.get(DEV_CODE_COOKIE)?.value;
+  // Production without SMTP: say so instead of claiming the code is on its way.
+  const notDelivered = !services().mailer.configured && !devCode;
   // Right after a correct code the action refreshes this route: the challenge is consumed but a session exists.
   // Keep rendering the same tree so the success animation and its redirect finish instead of flashing "expired".
   const justVerified = !info && Boolean(await currentSession());
@@ -42,6 +44,9 @@ export default async function CodePage() {
       <p className="mt-2 text-sm leading-relaxed text-white/80">
         {c.sentTo} <strong className="text-white">{info?.email ?? "…"}</strong>
       </p>
+      {notDelivered && info && (
+        <p role="alert" className="mt-3 rounded-[12px] bg-bad-soft px-3 py-2.5 text-sm font-medium text-bad">{c.notDelivered}</p>
+      )}
       {devCode && info && (
         <p className="mt-3 rounded-[12px] border border-dashed border-white/50 bg-white/10 px-3 py-2 text-xs text-white">
           <span className="mr-1.5 rounded bg-white px-1.5 py-0.5 font-bold text-[#1d5bd8]">DEV</span>

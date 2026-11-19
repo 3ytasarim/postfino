@@ -1,6 +1,7 @@
 "use client";
 import { useActionState } from "react";
 import type { FormState } from "@/app/(auth)/actions";
+import { PasswordInput } from "./password-input";
 
 type Field = { name: string; label: string; type?: string; autoComplete?: string; hint?: string; defaultValue?: string; options?: string[] };
 
@@ -11,6 +12,7 @@ export function AuthForm({
   errors,
   success,
   hidden = {},
+  passwordToggle,
 }: {
   action: (s: FormState, fd: FormData) => Promise<FormState>;
   fields: Field[];
@@ -18,6 +20,7 @@ export function AuthForm({
   errors: Record<string, string>;
   success?: string;
   hidden?: Record<string, string>;
+  passwordToggle?: { show: string; hide: string };
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
   return (
@@ -36,6 +39,16 @@ export function AuthForm({
                 <option key={o}>{o}</option>
               ))}
             </select>
+          ) : f.type === "password" ? (
+            <PasswordInput
+              id={f.name}
+              name={f.name}
+              autoComplete={f.autoComplete}
+              required
+              aria-describedby={f.hint ? `${f.name}-hint` : undefined}
+              showLabel={passwordToggle?.show}
+              hideLabel={passwordToggle?.hide}
+            />
           ) : (
             <input
               id={f.name}
