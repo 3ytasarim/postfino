@@ -102,6 +102,8 @@ export class InstagramAdapter implements PlatformAdapter {
       access_token: long.access_token,
     }).catch(() => ({ data: [] as { permission: string; status: string }[] }));
     let granted = perms.data.filter((p) => p.status === "granted").map((p) => p.permission);
+    // app-scoped id of the person who logged in: Meta's data-deletion / deauthorize callbacks identify them by it
+    const person = await this.get<{ id?: string }>("/me", { fields: "id", access_token: long.access_token }).catch(() => ({ id: undefined as string | undefined }));
     const pages = await this.get<{
       data: { id: string; name: string; access_token: string; instagram_business_account?: { id: string } }[];
     }>("/me/accounts", { fields: "id,name,access_token,instagram_business_account", access_token: long.access_token }).catch(() => ({ data: [] as { id: string; name: string; access_token: string; instagram_business_account?: { id: string } }[] }));
@@ -134,7 +136,7 @@ export class InstagramAdapter implements PlatformAdapter {
         accessToken: long.access_token,
         tokenExpiresAt: long.expires_in ? new Date(Date.now() + long.expires_in * 1000) : undefined,
         grantedScopes: granted,
-        meta: { pageId, pageName, loginFlow: this.opts.configId ? "facebook_login_for_business" : "facebook_login" },
+        meta: { pageId, pageName, loginFlow: this.opts.configId ? "facebook_login_for_business" : "facebook_login", metaUserId: person.id },
       });
     }
     if (!accounts.length)
@@ -153,7 +155,7 @@ export class InstagramAdapter implements PlatformAdapter {
       page = await this.get("/me/assigned_instagram_accounts", { fields: "id,username", limit: "50", after: page.paging.cursors.after, access_token: token });
       listed.push(...page.data);
     }
-    const dbg = await this.get<{ data?: { scopes?: string[]; expires_at?: number; type?: string; granular_scopes?: { scope: string; target_ids?: string[] }[] } }>("/debug_token", { input_token: token, access_token: `${this.opts.appId}|${this.opts.appSecret}` }).catch(() => ({ data: undefined }));
+    const dbg = await this.get<{ data?: { scopes?: string[]; expires_at?: number; type?: string; user_id?: string; granular_scopes?: { scope: string; target_ids?: string[] }[] } }>("/debug_token", { input_token: token, access_token: `${this.opts.appId}|${this.opts.appSecret}` }).catch(() => ({ data: undefined }));
     if (!listed.length) {
       // Fallbacks: the assets chosen in the dialog (granular scopes) and the client portfolio's Instagram accounts.
       for (const g of dbg.data?.granular_scopes ?? [])
@@ -183,7 +185,7 @@ export class InstagramAdapter implements PlatformAdapter {
         accessToken: token,
         tokenExpiresAt: expiresAt,
         grantedScopes: dbg.data?.scopes ?? [],
-        meta: { loginFlow: "unified_login", clientBusinessId: me.client_business_id, systemUserId: me.id || undefined },
+        meta: { loginFlow: "unified_login", clientBusinessId: me.client_business_id, systemUserId: me.id || undefined, metaUserId: dbg.data?.user_id },
       });
     }
     return accounts;

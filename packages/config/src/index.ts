@@ -112,8 +112,19 @@ let cached: AppConfig | undefined;
 export function getConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   if (env === process.env && cached) return cached;
   const parsed = schema.parse(env);
-  if (env === process.env) cached = parsed;
+  if (env === process.env) {
+    cached = parsed;
+    warnDevUrlsInProduction(parsed);
+  }
   return parsed;
+}
+
+/** Production with a localhost/plain-http public URL breaks links, cookies and OAuth redirects: say so loudly at start-up. */
+function warnDevUrlsInProduction(c: AppConfig) {
+  if (c.NODE_ENV !== "production") return;
+  const urls = { APP_URL: c.APP_URL, API_URL: c.API_URL, OAUTH_REDIRECT_BASE: c.OAUTH_REDIRECT_BASE, MEDIA_PUBLIC_BASE_URL: c.MEDIA_PUBLIC_BASE_URL };
+  for (const [k, v] of Object.entries(urls))
+    if (v && (/^http:\/\//.test(v) || /\/\/(localhost|127\.0\.0\.1)([:/]|$)/.test(v))) console.warn(`[config] ${k} is not a public HTTPS URL in production (${new URL(v).origin}); set it in the server .env`);
 }
 
 export const isMetaConfigured = (c: AppConfig) => Boolean(c.META_APP_ID && c.META_APP_SECRET);

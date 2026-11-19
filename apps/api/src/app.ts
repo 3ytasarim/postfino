@@ -57,6 +57,9 @@ import {
   listSlots,
   setSlots,
   type Actor,
+  parseMetaSignedRequest,
+  revokeMetaUser,
+  metaDeletionCode,
   type Services,
 } from "@sichttakt/core";
 
@@ -144,6 +147,28 @@ export function createApiApp(svc: Services, opts: { allowPrivateWebhookUrls?: bo
   app.get("/api/v1/openapi.yaml", async (c) => {
     const yaml = await readFile(path.join(here, "..", "..", "..", "docs", "API_OPENAPI.yaml"), "utf8");
     return c.body(yaml, 200, { "content-type": "application/yaml; charset=utf-8" });
+  });
+
+  // ── Meta callbacks (App Dashboard): data deletion request + deauthorize. Authenticated by the signed_request HMAC. ──
+  const metaSigned = async (c: Context<Env>) => {
+    const secret = svc.config.META_APP_SECRET;
+    if (!secret) throw new AppError("PROVIDER_NOT_CONFIGURED", "meta_not_configured");
+    const form = await c.req.parseBody().catch(() => ({}) as Record<string, unknown>);
+    const signed = typeof form.signed_request === "string" ? form.signed_request : "";
+    return { secret, req: parseMetaSignedRequest(signed, secret) };
+  };
+  app.post("/api/v1/meta/data-deletion", async (c) => {
+    const { secret, req } = await metaSigned(c);
+    await revokeMetaUser(db, req.user_id, "delete");
+    const code = metaDeletionCode(secret, req.user_id, req.issued_at);
+    const status = new URL("/datenloeschung", svc.config.APP_URL);
+    status.searchParams.set("code", code);
+    return c.json({ url: status.toString(), confirmation_code: code });
+  });
+  app.post("/api/v1/meta/deauthorize", async (c) => {
+    const { req } = await metaSigned(c);
+    await revokeMetaUser(db, req.user_id, "deauthorize");
+    return c.json({ ok: true });
   });
 
   // ── Auth + plan + quota middleware for every /api/v1 route ──

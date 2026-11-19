@@ -47,3 +47,5 @@ export * from "./billing";
 export * from "./admin";
 export * from "./branding";
 export * from "./social-auth";
+export * from "./meta-deletion";
+export * from "./account-deletion";

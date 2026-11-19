@@ -9,8 +9,8 @@ import { loginAction, registerAction } from "../actions";
 export const metadata = { title: "Anmelden" };
 
 /** One route for both: /login (sign in) and /login?mode=register (create account); invitations keep working. */
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; mode?: string; invite?: string }> }) {
-  const { next, mode, invite } = await searchParams;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; mode?: string; invite?: string; deleted?: string }> }) {
+  const { next, mode, invite, deleted } = await searchParams;
   const { t } = await getMessages();
   // Invited users: the email is taken from the invitation (server-side), never from the URL.
   const inv = invite ? await getInvite(services().db, invite) : null;
@@ -18,6 +18,11 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
   const loginForm = (
     <>
+      {deleted === "1" && (
+        <p role="status" className="mb-4 rounded-xl bg-white/10 px-4 py-3 text-sm text-white/90">
+          {t.accountDelete.deleted}
+        </p>
+      )}
       <AuthForm
         action={loginAction}
         submit={a.login}

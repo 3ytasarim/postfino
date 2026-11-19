@@ -5,7 +5,8 @@ import { TotpSetup } from "@/components/totp-setup";
 import { ResendVerification } from "@/components/resend-verification";
 import { getMessages } from "@/i18n";
 import { requireContext } from "@/lib/server";
-import { getBrandVoice } from "@sichttakt/core";
+import { getBrandVoice, planAccountDeletion } from "@sichttakt/core";
+import { DeleteAccount } from "@/components/delete-account";
 import { FormAction } from "@/components/form-action";
 import { saveBrandVoiceAction, updateWorkspaceAction } from "../actions-content";
 import { setPreferenceAction } from "../actions";
@@ -17,6 +18,7 @@ export default async function SettingsPage() {
   const { t, locale } = await getMessages();
   const theme = (await cookies()).get("st_theme")?.value ?? "system";
   const voice = await getBrandVoice(ctx.svc.db, ctx.actor, ctx.workspace.id);
+  const deletion = await planAccountDeletion(ctx.svc.db, ctx.user.id);
   return (
     <>
       <PageHeader title={t.settings.title} />
@@ -113,6 +115,10 @@ export default async function SettingsPage() {
             </select>
           </label>
         </FormAction>
+      </section>
+      <section id="konto-loeschen" className="card mt-6 border border-bad/30 p-6">
+        <h2 className="mb-3 text-lg font-bold text-bad">{t.accountDelete.title}</h2>
+        <DeleteAccount t={t.accountDelete} plan={deletion} hasPassword={Boolean(ctx.user.passwordHash)} />
       </section>
     </>
   );

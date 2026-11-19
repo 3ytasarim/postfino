@@ -64,6 +64,29 @@ const T = {
     en: (code: string, provider: string) => ({ subject: `${code} is your sign-in code`, text: `Hi,\n\nyou are signing in to Postfino with ${provider}. Your verification code:\n\n    ${code}\n\nThe code is valid for 10 minutes. Never share it – we will never ask for it.\nNot you? Ignore this email; nobody can sign in without the code.\n\n— Postfino by Bleibsichtbar LLC` }),
     tr: (code: string, provider: string) => ({ subject: `Giriş kodun: ${code}`, text: `Merhaba,\n\nPostfino'ya ${provider} ile giriş yapıyorsun. Doğrulama kodun:\n\n    ${code}\n\nKod 10 dakika geçerlidir. Kimseyle paylaşma – biz asla istemeyiz.\nBu sen değilsen e-postayı yok say; kod olmadan giriş yapılamaz.\n\n— Postfino by Bleibsichtbar LLC` }),
   },
+  accountDeleted: {
+    de: () => ({ subject: "Dein Postfino-Konto wurde gelöscht", text: `Hallo,
+
+dein Postfino-Konto wurde auf deinen Wunsch gelöscht. Verbundene Social-Media-Konten wurden getrennt, ihre Zugriffsschlüssel vernichtet, und Teams, in denen du das einzige Mitglied warst, wurden mit allen Inhalten und Medien entfernt.
+
+Warst du das nicht? Antworte bitte sofort auf diese E-Mail.
+
+— Postfino by Bleibsichtbar LLC` }),
+    en: () => ({ subject: "Your Postfino account was deleted", text: `Hi,
+
+your Postfino account was deleted at your request. Connected social accounts were disconnected and their access tokens destroyed; teams in which you were the only member were removed with all content and media.
+
+Not you? Please reply to this email right away.
+
+— Postfino by Bleibsichtbar LLC` }),
+    tr: () => ({ subject: "Postfino hesabın silindi", text: `Merhaba,
+
+Postfino hesabın isteğin üzerine silindi. Bağlı sosyal medya hesapları ayrıldı ve erişim anahtarları yok edildi; tek üyesi olduğun ekipler tüm içerik ve medyalarıyla kaldırıldı.
+
+Bunu sen yapmadıysan lütfen hemen bu e-postayı yanıtla.
+
+— Postfino by Bleibsichtbar LLC` }),
+  },
   verify: {
     de: (link: string) => ({ subject: "E-Mail-Adresse bestätigen", text: `Willkommen bei Postfino!\n\nBitte bestätige deine E-Mail-Adresse:\n${link}` }),
     en: (link: string) => ({ subject: "Confirm your email address", text: `Welcome to Postfino!\n\nPlease confirm your email address:\n${link}` }),
@@ -77,4 +100,5 @@ export const mailTemplates = {
   signupCode: (l: string, code: string) => T.signupCode[loc(l)](code),
   loginCode: (l: string, code: string, provider: string) => T.loginCode[loc(l)](code, provider),
   verify: (l: string, link: string) => T.verify[loc(l)](link),
+  accountDeleted: (l: string) => T.accountDeleted[loc(l)](),
 };
