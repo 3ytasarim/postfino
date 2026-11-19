@@ -118,7 +118,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </a>
       <div className="shell-in relative z-[1] mx-auto flex max-w-[1680px] gap-4 p-2 sm:p-3 lg:h-dvh lg:p-5">
         <Sidebar
-          labels={{ ...t.nav, logout: t.auth.logout, reauth: t.health.reauth }}
+          labels={{ ...t.nav, logout: t.auth.logout, reauth: t.health.reauth, madeByPre: t.brand.madeByPre, madeBySuf: t.brand.madeBySuf }}
           workspaceSwitcher={ctx.workspaces.length > 1 ? switcher : null}
           org={{ name: ctx.organization.name, plan: `${t.billing.current}: ${ent.planCode.charAt(0).toUpperCase()}${ent.planCode.slice(1)}`, planCode: ent.planCode, userName: ctx.user.name, userEmail: ctx.user.email }}
           channels={sidebarChannels}

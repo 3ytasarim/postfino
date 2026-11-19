@@ -1,6 +1,6 @@
 // Source dictionary (German is the product default). en/tr must satisfy this shape (type-checked).
 const de = {
-  brand: { tagline: "Deine Inhalte. Dein Rhythmus. Deine Sichtbarkeit.", by: "by Bleibsichtbar LLC" },
+  brand: { tagline: "Deine Inhalte. Dein Rhythmus. Deine Sichtbarkeit.", by: "by Bleibsichtbar LLC", madeByPre: "Ein Produkt von", madeBySuf: "" },
   common: {
     save: "Speichern",
     cancel: "Abbrechen",
@@ -461,6 +461,9 @@ const de = {
     twoFactorSetup: "2FA einrichten",
     twoFactorSecret: "Geheimschlüssel für deine Authenticator-App:",
     twoFactorConfirm: "Code bestätigen",
+    twoFactorScan: "Scanne den QR-Code mit deiner Authenticator-App, z. B. Microsoft oder Google Authenticator.",
+    twoFactorManual: "Kein Scan möglich? Schlüssel manuell eingeben:",
+    twoFactorCode: "Gib danach den 6-stelligen Code aus der App ein.",
   },
   startPageUi: {title: "Start Page",subtitle: "Deine Link-in-Bio-Seite mit Shop Grid. Bearbeiten ist ein Entwurf – erst „Veröffentlichen“ macht Änderungen öffentlich.",settings: "Seite",slug: "Adresse",pageTitle: "Titel",description: "Beschreibung",theme: "Farbschema",font: "Schrift",buttonStyle: "Buttons",filled: "Gefüllt",outline: "Kontur",avatar: "Profilbild",noAvatar: "Kein Bild",fonts: "Grotesk,Serif,Sans",presets: "Takt (dunkel),Papier,Minze,Nacht",blocks: "Blöcke",addBlock: "Block hinzufügen",blockType: "Typ",types: "Button,Text,Bild,Video,Social Links,Bildraster,Shop Grid",label: "Beschriftung",url: "Ziel-URL",text: "Text",align: "Ausrichtung",left: "Links",center: "Zentriert",image: "Bild",images: "Bilder (mehrfach wählbar)",alt: "Alt-Text",caption: "Bildunterschrift",optionalUrl: "Link (optional)",socialLinks: "Ein Link pro Zeile: netzwerk URL (z. B. instagram https://instagram.com/marke)",networks: "Netzwerke: instagram, facebook, linkedin, tiktok, youtube, x, threads, pinterest, bluesky, mastodon, website, email",gridTitle: "Überschrift (optional)",moveUp: "Nach oben",moveDown: "Nach unten",edit: "Bearbeiten",publish: "Veröffentlichen",republish: "Erneut veröffentlichen",published: "Veröffentlicht",notPublished: "Nicht veröffentlicht",draftChanged: "Entwurf enthält unveröffentlichte Änderungen.",upToDate: "Öffentliche Version entspricht dem Entwurf.",revert: "Entwurf verwerfen",unpublish: "Offline nehmen",viewPublic: "Öffentliche Seite öffnen",version: "Version",shopGrid: "Shop Grid",shopGridHint: "Kacheln aus veröffentlichten Beiträgen oder Medien – jede Kachel verlinkt auf ein Produkt.",gridFromPost: "Aus veröffentlichtem Beitrag",gridFromAsset: "Aus Medienbibliothek",targetUrl: "Produkt-URL",noPublished: "Noch keine veröffentlichten Beiträge mit Bild.",noImages: "Keine fertigen Bilder in der Medienbibliothek.",needShopBlock: "Füge einen Shop-Grid-Block hinzu, damit die Kacheln auf der Seite erscheinen.",stats: "Statistik (30 Tage)",views: "Aufrufe",clicks: "Klicks",ctr: "Klickrate",statsNote: "Erstanbieter-Zählung ohne Cookies und ohne IP-Adresse; Bots werden herausgefiltert. Nicht mit Plattform-Metriken vermischt.",preview: "Vorschau (Entwurf)",emptyBlocks: "Noch keine Blöcke.",none: "—"},
   linksPage: {title: "Kurzlinks",subtitle: "Kurzlinks auf eigener Domain mit Klickzählung ohne Cookies und IP. Dieselbe Ziel-URL wird wiederverwendet.",create: "Kurzlink erstellen",url: "Lange URL",short: "Kurzlink",target: "Ziel",clicks: "Klicks",created: "Erstellt",disable: "Deaktivieren",disabled: "Deaktiviert",empty: "Noch keine Kurzlinks.",shorten: "Links kürzen",shortenHint: "Ersetzt alle URLs im Text durch Kurzlinks.",bitly: "Mit Bitly kürzen"},

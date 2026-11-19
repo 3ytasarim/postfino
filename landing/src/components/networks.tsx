@@ -14,7 +14,7 @@ function MarqueeRow({ items, duration, reverse = false }: { items: readonly stri
     <div className="marquee overflow-hidden py-1.5">
       <ul className={`marquee-track gap-3 pr-3 ${reverse ? "reverse" : ""}`} style={{ animationDuration: `${duration}s` }}>
         {row.map((p, i) => (
-          <li key={i} aria-hidden={i >= items.length} className="flex items-center gap-2.5 rounded-full bg-white py-2 pr-4 pl-2 shadow-[0_10px_30px_-18px_rgba(16,40,110,0.4)] ring-1 ring-line">
+          <li key={i} aria-hidden={i >= items.length} className="flex items-center gap-2.5 rounded-full bg-surface py-2 pr-4 pl-2 shadow-[0_10px_30px_-18px_rgba(16,40,110,0.4)] ring-1 ring-line">
             <NetworkIcon platform={p} badge size={26} />
             <span className="text-sm font-semibold whitespace-nowrap">{NETWORK_NAMES[p] ?? p}</span>
           </li>
@@ -35,7 +35,7 @@ export function Networks() {
             Ein Beitrag. <span className="shine">Elf Netzwerke.</span>
           </h2>
           <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-2">Schreib einmal, passe pro Netzwerk an und lass Postfino zur geplanten Zeit veröffentlichen – über die offiziellen Schnittstellen.</p>
-          <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold shadow-sm ring-1 ring-line">
+          <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-sm font-semibold shadow-sm ring-1 ring-line">
             <span className="relative grid size-2.5 place-items-center">
               <span className="ping-ring absolute inset-0 rounded-full bg-mint" />
               <span className="size-2.5 rounded-full bg-mint" />

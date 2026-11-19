@@ -38,10 +38,10 @@ export function Pricing() {
                 {p.featured && (
                   <div aria-hidden className="absolute -inset-[2px] overflow-hidden rounded-[26px]">
                     <div className="price-spin absolute -inset-full blur-[2px]" />
-                    <div className="absolute inset-[2px] rounded-[24px] bg-white" />
+                    <div className="absolute inset-[2px] rounded-[24px] bg-surface" />
                   </div>
                 )}
-                <article className={`relative flex flex-1 flex-col gap-7 rounded-3xl bg-white p-7 ${p.featured ? "shadow-[0_40px_80px_-30px_rgba(0,71,171,0.55)]" : "shadow-[0_20px_50px_-30px_rgba(16,40,110,0.35)] ring-1 ring-line"}`}>
+                <article className={`relative flex flex-1 flex-col gap-7 rounded-3xl bg-surface p-7 ${p.featured ? "shadow-[0_40px_80px_-30px_rgba(0,71,171,0.55)]" : "shadow-[0_20px_50px_-30px_rgba(16,40,110,0.35)] ring-1 ring-line"}`}>
                   <header className="flex flex-col gap-3">
                     <div className="flex items-center justify-between gap-2">
                       <h3 className="font-display text-2xl font-bold text-cobalt">{p.name}</h3>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { MadeBy } from "./made-by";
 import {
   Home,
   Lightbulb,
@@ -390,6 +391,9 @@ export function Sidebar({
                       </form>
                     </li>
                   </ul>
+                  <div className="mt-2 flex justify-center border-t border-line pt-3 pb-1">
+                    <MadeBy pre={labels.madeByPre} suf={labels.madeBySuf} />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

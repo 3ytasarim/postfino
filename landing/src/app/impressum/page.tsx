@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { LEGAL_V2 } from "@/lib/legal";
+import { ImpressumV2 } from "@/components/legal-v2";
 import { LegalPage, Todo } from "@/components/legal-page";
 import { COMPANY, CONTACT_EMAIL, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Impressum", description: `Anbieterkennzeichnung für Postfino, eine Anwendung der ${COMPANY}.`, alternates: { canonical: "/impressum" } };
 
 export default function Page() {
+  if (LEGAL_V2) return <ImpressumV2 />;
   return (
     <LegalPage title="Impressum" updated="14. November 2026">
       <h2>Anbieter</h2>

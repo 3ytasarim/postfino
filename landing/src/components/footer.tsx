@@ -2,12 +2,14 @@ import Link from "next/link";
 import { ArrowUp } from "lucide-react";
 import { Logo } from "./logo";
 import { FooterBand } from "./footer-band";
+import { MadeBy } from "./made-by";
+import { LEGAL_LINKS } from "@/lib/legal";
 import { COMPANY, CONTACT_EMAIL, LOGIN_URL, REGISTER_URL } from "@/lib/site";
 
 const COLS = [
   ["Produkt", [["/#funktionen", "Funktionen"], ["/#so-gehts", "So geht's"], ["/#netzwerke", "Netzwerke"], ["/#preise", "Preise"], ["/#faq", "FAQ"]]],
   ["Kontakt", [[REGISTER_URL, "Konto erstellen"], [LOGIN_URL, "Anmelden"], [`mailto:${CONTACT_EMAIL}`, "E-Mail schreiben"]]],
-  ["Rechtliches", [["/impressum", "Impressum"], ["/datenschutz", "Datenschutz"], ["/nutzungsbedingungen", "Nutzungsbedingungen"], ["/datenloeschung", "Datenlöschung"]]],
+  ["Rechtliches", LEGAL_LINKS],
 ] as const;
 
 export function Footer() {
@@ -18,12 +20,13 @@ export function Footer() {
           <Link href="/#top" aria-label="Postfino – nach oben" className="inline-flex">
             <Logo size={36} />
           </Link>
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-2">Social-Media-Planung für Selbstständige, Teams und Agenturen. Postfino ist eine Anwendung der {COMPANY}.</p>
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-2">Social-Media-Planung für Selbstständige, Teams und Agenturen.</p>
+          <MadeBy className="mt-4" />
           <div className="mt-6 flex flex-wrap gap-2">
             <a href={REGISTER_URL} className="inline-flex min-h-11 items-center rounded-full bg-cobalt px-5 text-sm font-semibold text-white shadow-[0_12px_26px_-12px_#0047ab] transition-all hover:-translate-y-0.5 hover:bg-cobalt-2">
               Jetzt starten
             </a>
-            <a href={LOGIN_URL} className="inline-flex min-h-11 items-center rounded-full bg-white/70 px-5 text-sm font-semibold ring-1 ring-cobalt/15 transition-all hover:-translate-y-0.5 hover:bg-white">
+            <a href={LOGIN_URL} className="inline-flex min-h-11 items-center rounded-full bg-surface/70 px-5 text-sm font-semibold ring-1 ring-cobalt/15 transition-all hover:-translate-y-0.5 hover:bg-surface">
               Anmelden
             </a>
           </div>

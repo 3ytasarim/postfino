@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { AuthFrame } from "@/components/auth-frame";
 import { getMessages } from "@/i18n";
+import { MadeBy } from "@/components/made-by";
 
 /** Auth area: always the dark glass look on an animated cobalt aurora, brand wordmark centred above the card. */
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -21,9 +22,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
         <main className="rise flex w-full flex-1 items-start justify-center sm:items-center">
           <AuthFrame>{children}</AuthFrame>
         </main>
-        <p className="mt-8 text-xs text-white/45">
-          Postfino — {t.brand.by}
-        </p>
+        <MadeBy tone="dark" pre={t.brand.madeByPre} suf={t.brand.madeBySuf} className="mt-8" />
       </div>
     </div>
   );

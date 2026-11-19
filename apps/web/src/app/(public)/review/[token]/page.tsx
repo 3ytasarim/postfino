@@ -4,6 +4,7 @@ import { Notice } from "@/components/ui";
 import { ReviewDecision } from "@/components/review-decision";
 import { getMessages, intlLocale, fmt } from "@/i18n";
 import { services } from "@/lib/server";
+import { MadeBy } from "@/components/made-by";
 
 export const metadata = { title: "Freigabe", robots: { index: false, follow: false }, referrer: "no-referrer" as const };
 
@@ -84,7 +85,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ token: 
       <ReviewDecision token={token} t={t.review} accent={brand.accentColor} />
     </article>
       </main>
-      {!brand.hidePoweredBy && <footer className="mx-auto max-w-3xl px-4 pb-10 text-xs text-ink-3">Postfino — {t.brand.by}</footer>}
+      {!brand.hidePoweredBy && <footer className="mx-auto max-w-3xl px-4 pb-10"><MadeBy pre={t.brand.madeByPre} suf={t.brand.madeBySuf} /></footer>}
     </>
   );
 }

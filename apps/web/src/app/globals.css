@@ -461,3 +461,54 @@ a:hover > .add-card { border-color: var(--takt); }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── "Ein Produkt von bleibsichtbar." seal ── */
+.madeby { --mb-ink: #0a1530; --mb-pre: #5b6478; --mb-bg: rgba(255,255,255,.94); --mb-ring: rgba(0,71,171,.14); --mb-blue: #007bff;
+  position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; gap: .45em; min-height: 44px;
+  padding: .5em 1.05em; border-radius: 999px; font-size: 13px; background: var(--mb-bg); box-shadow: inset 0 0 0 1px var(--mb-ring), 0 10px 28px -18px rgba(0,71,171,.55);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s; text-decoration: none; }
+.madeby[data-size="md"] { font-size: 15px; padding: .55em 1.2em; }
+.madeby:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px rgba(0,123,255,.45), 0 16px 34px -18px rgba(0,123,255,.7); }
+.madeby:focus-visible { outline: 2px solid var(--mb-blue); outline-offset: 3px; }
+.madeby::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgba(0,123,255,.16) 46%, rgba(255,255,255,.55) 50%, rgba(0,123,255,.16) 54%, transparent 70%);
+  transform: translateX(-120%); animation: mbSweep 5.5s cubic-bezier(.4,0,.2,1) infinite 1.2s; }
+.madeby-pre { color: var(--mb-pre); font-weight: 500; }
+.madeby-mark { display: inline-flex; align-items: baseline; font-family: var(--font-outfit), var(--font-display); font-weight: 600; font-size: 1.22em; letter-spacing: -.025em; line-height: 1; color: var(--mb-ink); }
+.madeby-mark > span:not(.madeby-dot) { display: inline-block; animation: mbWave 5.5s cubic-bezier(.16,1,.3,1) infinite; animation-delay: calc(1.4s + var(--i) * 55ms); }
+.madeby-dot { position: relative; display: inline-block; width: .21em; height: .21em; margin-left: .08em; border-radius: 50%; background: #0074fd; }
+/* login: plain brand-blue dots (bleibsichtbar logo colour) on the Postfino wordmark */
+.auth-root .logo-pill { background: #0074fd; }
+@keyframes mbSweep { 0% { transform: translateX(-120%); } 35%, 100% { transform: translateX(120%); } }
+@keyframes mbWave { 0%, 14%, 100% { transform: none; color: inherit; } 5% { transform: translateY(-.16em); color: var(--mb-blue); } }
+@media (prefers-reduced-motion: reduce) { .madeby::after, .madeby-mark > span { animation: none; } }
+
+/* ── Mascot stage (components/mascot-stage.tsx): compositor-only loops ── */
+.m-float { animation: mFloat 6.5s ease-in-out infinite; }
+.m-breathe { transform-origin: 50% 92%; animation: mBreathe 3.2s ease-in-out infinite; }
+.m-bob { animation: mBob 4.2s ease-in-out infinite; }
+.m-burst { animation: mBurst 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite; }
+.m-twinkle { animation: mTwinkle 2.7s ease-in-out infinite; }
+@keyframes mFloat { 50% { transform: translateY(-10px); } }
+@keyframes mBreathe { 50% { transform: scale(1.012, 0.99); } }
+@keyframes mBob { 0%, 100% { transform: translateY(0) rotate(0deg); } 35% { transform: translateY(-9%) rotate(-5deg); } 70% { transform: translateY(4%) rotate(3deg); } }
+@keyframes mBurst { 0% { transform: scale(0.55); opacity: 0; } 18% { transform: scale(1.08); opacity: 1; } 55% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.15); opacity: 0; } }
+@keyframes mTwinkle { 0%, 100% { transform: scale(0.6) rotate(0deg); opacity: 0.45; } 50% { transform: scale(1.15) rotate(45deg); opacity: 1; } }
+/* "Postfino." sign (mascot-sign.tsx): rises out of the crowd with an overshoot, waves while up, sinks back */
+.m-sign { position: absolute; left: 0; bottom: 0; width: 100%; display: flex; justify-content: center; transform: translateY(105%); transition: transform .55s cubic-bezier(.5,0,.75,0); container-type: inline-size; }
+.m-sign.is-up { transform: translateY(0); transition: transform .75s cubic-bezier(.34,1.45,.5,1); }
+.m-sign-wave { display: flex; flex-direction: column; align-items: center; transform-origin: 50% 100%; }
+.m-sign.is-up .m-sign-wave { animation: mSignWave 1.5s ease-in-out .5s 2 alternate; }
+.m-sign-board { display: inline-flex; align-items: baseline; gap: .05em; padding: .32em .7em .38em; border-radius: .5em; background: linear-gradient(180deg, #fff, #eef3ff); font-size: 15cqi;
+  box-shadow: 0 0 0 .07em #0047ab, 0 .35em .7em -.2em rgba(0,10,40,.6), inset 0 -.12em 0 rgba(0,71,171,.12); }
+.m-sign-word { font-family: var(--font-inter), sans-serif; font-weight: 800; letter-spacing: -.045em; line-height: 1; color: #0b1020; }
+.m-sign-dot { display: inline-block; width: .26em; height: .26em; border-radius: 50%; background: #0047ab; transform: scale(0); transition: transform .3s; }
+.m-sign.is-up .m-sign-dot { transform: scale(1); transition: transform .45s cubic-bezier(.34,1.8,.5,1) .55s; }
+.m-sign-stick { display: block; width: 5cqi; height: 80cqi; margin-top: -.1em; border-radius: 99px; background: linear-gradient(90deg, #c98b4d, #e9b277 45%, #b0743c); box-shadow: inset 0 0 0 1px rgba(80,40,10,.25); }
+@keyframes mSignWave { 0% { transform: rotate(calc(var(--tilt) * -5deg)); } 100% { transform: rotate(calc(var(--tilt) * 6deg)); } }
+@media (prefers-reduced-motion: reduce) {
+  .m-float, .m-breathe, .m-bob, .m-burst, .m-twinkle, .m-sign-wave { animation: none !important; }
+  .m-sign, .m-sign-dot { transition: none !important; }
+}
+/* login: deep navy at the top fading into the aurora, so the blue logo dot reads */
+.auth-root .aurora::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, #071a4a 0%, rgba(7, 26, 74, .82) 14%, rgba(7, 26, 74, .35) 38%, rgba(7, 26, 74, 0) 62%); }

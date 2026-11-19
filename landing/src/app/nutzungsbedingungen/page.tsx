@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { permanentRedirect } from "next/navigation";
+import { LEGAL_V2 } from "@/lib/legal";
 import Link from "next/link";
 import { LegalPage, Todo } from "@/components/legal-page";
 import { COMPANY, CONTACT_EMAIL } from "@/lib/site";
@@ -10,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  if (LEGAL_V2) permanentRedirect("/agb");
   return (
     <LegalPage title="Nutzungsbedingungen" updated="14. November 2026">
       <h2>1. Geltungsbereich</h2>

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
+import { MascotStage } from "./mascot-stage";
 
 export type AuthSwitchTexts = { login: string; register: string; welcomeTitle: string; welcomeSub: string; registerTitle: string; newHere: string; newHereSub: string; createAccount: string; haveAccountTitle: string; haveAccountSub: string; toLogin: string };
 
@@ -31,8 +32,7 @@ export function AuthSwitch({ initial, t, loginForm, registerForm }: { initial: "
           {forLogin ? t.createAccount : t.toLogin}
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
         </button>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/mascots-960.webp" alt="" className="auth-mascot mt-6 w-full max-w-[340px] mix-blend-lighten" />
+        <MascotStage className="mt-4 w-full max-w-[340px]" />
       </div>
     );
   };

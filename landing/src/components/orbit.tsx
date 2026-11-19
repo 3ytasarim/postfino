@@ -24,7 +24,7 @@ function Ring({ items, radius, duration, reverse = false, size, active, done }: 
           <span key={p} className="absolute" style={{ left: Math.round(radius + Math.cos(a) * radius - size / 2), top: Math.round(radius + Math.sin(a) * radius - size / 2) }}>
             <span className="orbit-ring block" style={{ width: size, height: size, animationDuration: `${duration}s`, animationDirection: reverse ? "normal" : "reverse" }}>
               <motion.span
-                className="relative grid size-full place-items-center rounded-2xl bg-white ring-1 ring-line"
+                className="relative grid size-full place-items-center rounded-2xl bg-surface ring-1 ring-line"
                 initial={false}
                 animate={on ? { scale: 1.18, boxShadow: done ? "0 0 0 3px #19c39c, 0 18px 36px -10px rgba(25,195,156,0.65)" : "0 0 0 3px #4f8dff, 0 18px 36px -10px rgba(0,71,171,0.55)" } : { scale: 1, boxShadow: "0 14px 30px -12px rgba(16,40,110,0.45)" }}
                 transition={{ type: "spring", stiffness: 320, damping: 22 }}
@@ -32,7 +32,7 @@ function Ring({ items, radius, duration, reverse = false, size, active, done }: 
                 <NetworkIcon platform={p} badge size={Math.round(size * 0.62)} />
                 <AnimatePresence>
                   {on && done && (
-                    <motion.span initial={{ scale: 0, rotate: -90 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0, opacity: 0 }} transition={{ type: "spring", stiffness: 460, damping: 18 }} className="absolute -top-1.5 -right-1.5 grid size-5 place-items-center rounded-full bg-mint text-white ring-2 ring-white">
+                    <motion.span initial={{ scale: 0, rotate: -90 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0, opacity: 0 }} transition={{ type: "spring", stiffness: 460, damping: 18 }} className="absolute -top-1.5 -right-1.5 grid size-5 place-items-center rounded-full bg-mint text-white ring-2 ring-surface">
                       <Check className="size-3" strokeWidth={3.5} />
                     </motion.span>
                   )}
@@ -73,7 +73,7 @@ export function Orbit() {
         <AnimatePresence>
           <motion.span key={t} className="absolute inset-0 rounded-[20px] border-2 border-sky sm:rounded-[26px]" initial={{ opacity: 0.7, scale: 1 }} animate={{ opacity: 0, scale: 1.7 }} exit={{ opacity: 0 }} transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }} />
         </AnimatePresence>
-        <div className="relative w-[104px] overflow-hidden rounded-[20px] sm:w-[188px] sm:rounded-[26px] bg-white shadow-[0_30px_60px_-20px_rgba(0,71,171,0.55)] ring-1 ring-line">
+        <div className="relative w-[104px] overflow-hidden rounded-[20px] sm:w-[188px] sm:rounded-[26px] bg-surface shadow-[0_30px_60px_-20px_rgba(0,71,171,0.55)] ring-1 ring-line">
           <div className="grid origin-center scale-[0.72] place-items-center px-4 pt-3 pb-1.5 sm:scale-100 sm:pt-5 sm:pb-3">
             <Logo size={30} />
           </div>

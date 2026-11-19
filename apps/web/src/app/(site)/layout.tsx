@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { getMessages } from "@/i18n";
+import { MadeBy } from "@/components/made-by";
 
 // Public, indexable site pages (developer portal, status). No session required.
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <main id="main" className="mx-auto max-w-6xl px-4 py-12">
         {children}
       </main>
-      <footer className="mx-auto max-w-6xl px-4 pb-10 text-xs text-ink-3">Postfino — {t.brand.by}</footer>
+      <footer className="mx-auto max-w-6xl px-4 pb-10"><MadeBy pre={t.brand.madeByPre} suf={t.brand.madeBySuf} /></footer>
     </div>
   );
 }

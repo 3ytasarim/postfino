@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Outfit, Space_Grotesk } from "next/font/google";
 import { cookies } from "next/headers";
 import { getLocale } from "@/i18n";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter", display: "swap" });
 const grotesk = Space_Grotesk({ subsets: ["latin", "latin-ext"], variable: "--font-grotesk", display: "swap" });
+const outfit = Outfit({ subsets: ["latin", "latin-ext"], weight: ["600"], variable: "--font-outfit", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Postfino — by Bleibsichtbar LLC", template: "%s · Postfino" },
@@ -23,7 +24,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     // translate="no": the app ships its own DE/EN/TR UI. Browser auto-translation (Google Translate) rewrites
     // text nodes behind React's back and crashes client components ("removeChild … not a child of this node").
-    <html lang={locale} translate="no" data-theme={theme === "dark" || theme === "light" ? theme : undefined} className={`${inter.variable} ${grotesk.variable}`} suppressHydrationWarning>
+    <html lang={locale} translate="no" data-theme={theme === "dark" || theme === "light" ? theme : undefined} className={`${inter.variable} ${grotesk.variable} ${outfit.variable}`} suppressHydrationWarning>
       <head>
         <meta name="google" content="notranslate" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

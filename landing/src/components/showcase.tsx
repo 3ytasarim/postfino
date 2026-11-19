@@ -34,7 +34,7 @@ function PostBlock({ p, title, h, done, lifted = false }: { p: string; title: st
   const hh = String(Math.floor(h)).padStart(2, "0");
   const mm = h % 1 ? "30" : "00";
   return (
-    <div className={`flex h-[52px] flex-col justify-center overflow-hidden rounded-lg border-l-[3px] px-2 ${lifted ? "bg-white shadow-[0_18px_36px_-12px_rgba(16,40,110,0.55)] ring-2 ring-sky" : "shadow-sm"}`} style={{ borderLeftColor: c, background: lifted ? undefined : `color-mix(in srgb, ${c} 9%, white)` }}>
+    <div className={`flex h-[52px] flex-col justify-center overflow-hidden rounded-lg border-l-[3px] px-2 ${lifted ? "bg-surface shadow-[0_18px_36px_-12px_rgba(16,40,110,0.55)] ring-2 ring-sky" : "shadow-sm"}`} style={{ borderLeftColor: c, background: lifted ? undefined : `color-mix(in srgb, ${c} 9%, white)` }}>
       <span className="flex items-center gap-1 text-[0.62rem] font-bold text-ink-2">
         <NetworkIcon platform={p} badge size={14} />
         {hh}:{mm}
@@ -51,7 +51,7 @@ function CalendarView() {
   const height = (19 - H0) * HOUR_PX;
   const drag = { duration: 5, times: [0, 0.15, 0.6, 0.75, 1], repeat: Infinity, repeatDelay: 1, ease: "easeInOut" as const };
   return (
-    <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-line">
+    <div className="rounded-2xl bg-surface p-3 shadow-sm ring-1 ring-line">
       {/* toolbar */}
       <div className="flex items-center gap-2 pb-3">
         <span className="flex items-center gap-0.5">
@@ -64,7 +64,7 @@ function CalendarView() {
         </span>
         <span className="font-display text-sm font-bold">10. – 14. November</span>
         <span className="ml-auto hidden items-center rounded-lg bg-paper p-0.5 text-[0.7rem] font-semibold ring-1 ring-line sm:flex">
-          <span className="rounded-md bg-white px-2 py-1 shadow-sm">Woche</span>
+          <span className="rounded-md bg-surface px-2 py-1 shadow-sm">Woche</span>
           <span className="px-2 py-1 text-ink-3">Monat</span>
           <span className="px-2 py-1 text-ink-3">Liste</span>
         </span>
@@ -108,7 +108,7 @@ function CalendarView() {
 
         {/* "now" line in today's column */}
         <motion.div className="absolute z-10 flex items-center" style={col(2)} initial={{ top: at(12.6) }} animate={{ top: [at(12.6), at(13.4), at(12.6)] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}>
-          <span className="-ml-1 size-2.5 rounded-full bg-[#ef4444] ring-2 ring-white" />
+          <span className="-ml-1 size-2.5 rounded-full bg-[#ef4444] ring-2 ring-surface" />
           <span className="h-[2px] flex-1 bg-[#ef4444]" />
         </motion.div>
 
@@ -116,7 +116,7 @@ function CalendarView() {
         <motion.span className="absolute h-[52px] rounded-lg border-2 border-dashed border-sky/60" style={{ top: at(13) + 2, ...col(3) }} initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 1, 0, 0] }} transition={drag} />
         <motion.div className="absolute z-20" style={col(3)} initial={{ top: at(13) + 2 }} animate={{ top: [at(13) + 2, at(13) + 2, at(12) + 2, at(12) + 2, at(13) + 2], x: ["0%", "0%", "108%", "108%", "0%"], rotate: [0, -3, -3, 0, 0], scale: [1, 1.05, 1.05, 1, 1] }} transition={drag}>
           <PostBlock p="pinterest" title="Moodboard Herbst" h={13} lifted />
-          <MousePointer2 className="absolute -right-2 -bottom-3 size-5 fill-ink text-white drop-shadow" />
+          <MousePointer2 className="absolute -right-2 -bottom-3 size-5 fill-[#0b1020] text-white drop-shadow" />
         </motion.div>
       </div>
       <div className="mt-3 flex items-center gap-3 border-t border-line pt-3 text-[0.7rem] font-semibold">
@@ -171,21 +171,21 @@ function IdeaCard({ it, moving, approved, fresh }: { it: Idea; moving: boolean; 
       initial={fresh ? { opacity: 0, scale: 0.85, y: -10 } : false}
       animate={{ opacity: 1, scale: moving ? 1.04 : 1, rotate: moving ? -2 : 0, y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 26 }}
-      className={`relative mb-2 rounded-xl bg-white p-2.5 ${moving ? "z-10 shadow-[0_18px_36px_-12px_rgba(16,40,110,0.5)] ring-2 ring-sky" : fresh ? "shadow-sm ring-2 ring-mint/60" : "shadow-sm ring-1 ring-line"}`}
+      className={`relative mb-2 rounded-xl bg-surface p-2.5 ${moving ? "z-10 shadow-[0_18px_36px_-12px_rgba(16,40,110,0.5)] ring-2 ring-sky" : fresh ? "shadow-sm ring-2 ring-mint/60" : "shadow-sm ring-1 ring-line"}`}
     >
       {it.thumb && <span className={`mb-2 block h-10 rounded-lg bg-gradient-to-br ${it.thumb}`} />}
       <span className="block text-[0.8rem] leading-snug font-semibold">{it.title}</span>
       <span className="mt-2 flex items-center gap-1.5">
         <span className={`rounded-full px-1.5 py-0.5 text-[0.6rem] font-bold ${it.tone}`}>{it.tag}</span>
         {fresh && <span className="rounded-full bg-mint px-1.5 py-0.5 text-[0.6rem] font-bold text-white">Neu</span>}
-        <span className="ml-auto grid size-5 place-items-center rounded-full bg-ink text-[0.55rem] font-bold text-white">{it.who}</span>
+        <span className="ml-auto grid size-5 place-items-center rounded-full bg-contrast text-[0.55rem] font-bold text-on-contrast">{it.who}</span>
       </span>
       {approved && (
         <motion.span initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="mt-2 flex items-center gap-1 text-[0.68rem] font-semibold text-mint">
           <CheckCircle2 className="size-3.5" /> Freigegeben
         </motion.span>
       )}
-      {moving && <MousePointer2 className="absolute -right-2 -bottom-3 size-5 fill-ink text-white drop-shadow" />}
+      {moving && <MousePointer2 className="absolute -right-2 -bottom-3 size-5 fill-[#0b1020] text-white drop-shadow" />}
     </motion.div>
   );
 }
@@ -199,13 +199,13 @@ function IdeasView({ on }: { on: boolean }) {
     ["Bereit", [...(s >= 2 ? ["faq"] : []), "launch"]],
   ];
   return (
-    <div className="flex h-full flex-col rounded-2xl bg-white p-3 shadow-sm ring-1 ring-line">
+    <div className="flex h-full flex-col rounded-2xl bg-surface p-3 shadow-sm ring-1 ring-line">
       <div className="flex items-center gap-2 pb-3">
         <span className="font-display text-sm font-bold">Ideen-Board</span>
         <span className="rounded-full bg-paper px-2 py-0.5 text-[0.65rem] font-semibold text-ink-3 ring-1 ring-line">Herbst-Kampagne</span>
         <span className="ml-auto flex -space-x-1.5">
           {["LK", "MB", "AS"].map((w, i) => (
-            <span key={w} className={`grid size-6 place-items-center rounded-full text-[0.55rem] font-bold text-white ring-2 ring-white ${["bg-cobalt", "bg-lilac", "bg-mint"][i]}`}>
+            <span key={w} className={`grid size-6 place-items-center rounded-full text-[0.55rem] font-bold text-white ring-2 ring-surface ${["bg-cobalt", "bg-lilac", "bg-mint"][i]}`}>
               {w}
             </span>
           ))}
@@ -255,9 +255,9 @@ function CommunityView({ on }: { on: boolean }) {
   const open = list.filter((m) => !m.done && !(m.who === "@lea.k" && done)).length;
   return (
     <div className="grid h-full grid-cols-[1fr_1.15fr] gap-3">
-      <div className="flex flex-col overflow-hidden rounded-2xl bg-white p-3 shadow-sm ring-1 ring-line">
+      <div className="flex flex-col overflow-hidden rounded-2xl bg-surface p-3 shadow-sm ring-1 ring-line">
         <div className="mb-3 flex items-center gap-1 rounded-lg bg-paper p-0.5 text-[0.68rem] font-semibold ring-1 ring-line">
-          <span className="rounded-md bg-white px-2 py-1 shadow-sm">Alle · {list.length}</span>
+          <span className="rounded-md bg-surface px-2 py-1 shadow-sm">Alle · {list.length}</span>
           <span className="px-2 py-1 text-ink-3">
             Offen ·{" "}
             <motion.span key={open} initial={{ scale: 1.6, color: "#0047ab" }} animate={{ scale: 1, color: "#6b7280" }} className="inline-block">
@@ -279,7 +279,7 @@ function CommunityView({ on }: { on: boolean }) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ type: "spring", stiffness: 340, damping: 28 }}
-                  className={`flex items-start gap-2.5 rounded-xl p-2.5 transition-colors duration-300 ${active ? "bg-white shadow-[0_10px_24px_-14px_rgba(16,40,110,0.55)] ring-2 ring-sky" : "bg-paper/80 ring-1 ring-line"}`}
+                  className={`flex items-start gap-2.5 rounded-xl p-2.5 transition-colors duration-300 ${active ? "bg-surface shadow-[0_10px_24px_-14px_rgba(16,40,110,0.55)] ring-2 ring-sky" : "bg-paper/80 ring-1 ring-line"}`}
                 >
                   <NetworkIcon platform={m.p} badge size={22} />
                   <span className="min-w-0 flex-1">
@@ -294,7 +294,7 @@ function CommunityView({ on }: { on: boolean }) {
         </ul>
       </div>
 
-      <div className="flex flex-col rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-line">
+      <div className="flex flex-col rounded-2xl bg-surface p-3.5 shadow-sm ring-1 ring-line">
         <div className="flex items-center gap-2 border-b border-line pb-2.5">
           <NetworkIcon platform="instagram_business" badge size={22} />
           <span className="text-[0.75rem] font-bold">@lea.k</span>
@@ -405,17 +405,35 @@ export function Showcase() {
       <SectionHead eyebrow="Einblick" title={<span id="showcase">Gebaut für den Arbeitsalltag.</span>} />
       <Reveal className="mx-auto mt-8 flex justify-center">
         <div role="tablist" aria-label="Bereiche der Anwendung" className="glass inline-flex rounded-full p-1.5">
-          {TABS.map(({ id, label, icon: I }) => (
-            <button key={id} role="tab" aria-selected={tab === id} aria-controls="showcase-panel" onClick={() => setTab(id)} className={`relative flex min-h-11 items-center gap-2 overflow-hidden rounded-full px-4 text-sm font-semibold transition-colors sm:px-5 ${tab === id ? "text-white" : "text-ink-2 hover:text-ink"}`}>
-              {tab === id && (
-                <motion.span layoutId="tab-pill" className="absolute inset-0 overflow-hidden rounded-full bg-ink" transition={{ type: "spring", stiffness: 380, damping: 32 }}>
-                  {!paused && <motion.span key={tab} className="absolute inset-y-0 left-0 bg-white/15" initial={{ width: "0%" }} animate={{ width: "100%" }} transition={{ duration: ROTATE_MS / 1000, ease: "linear" }} />}
-                </motion.span>
-              )}
-              <I className="relative size-4" />
-              <span className="relative">{label}</span>
-            </button>
-          ))}
+          {TABS.map(({ id, label, icon: I }) => {
+            const active = tab === id;
+            // the open tab fills up with blue water until the next tab takes over; white text rides on the water
+            const fill = { animationDuration: `${ROTATE_MS}ms` };
+            const mode = paused ? "is-full" : "";
+            return (
+              <button key={id} role="tab" aria-selected={active} aria-controls="showcase-panel" onClick={() => setTab(id)} className={`relative flex min-h-11 items-center gap-2 overflow-hidden rounded-full px-4 text-sm font-semibold transition-colors sm:px-5 ${active ? "text-cobalt" : "text-ink-2 hover:text-ink"}`}>
+                {active && (
+                  <motion.span layoutId="tab-pill" className="absolute inset-0 overflow-hidden rounded-full bg-cobalt/10 ring-1 ring-cobalt/20" transition={{ type: "spring", stiffness: 380, damping: 32 }}>
+                    <span key={`${tab}-${paused}`} className={`tab-water ${mode}`} style={fill} aria-hidden>
+                      <svg className="tab-wave" viewBox="0 0 120 12" preserveAspectRatio="none">
+                        <path d="M0 6 Q 15 0 30 6 T 60 6 T 90 6 T 120 6 V12 H0 Z" />
+                      </svg>
+                    </span>
+                  </motion.span>
+                )}
+                <I className="relative size-4" />
+                <span className="relative">{label}</span>
+                {active && (
+                  <span key={`${tab}-${paused}-t`} className={`tab-water-clip ${mode}`} style={fill} aria-hidden>
+                    <span className={`tab-water-text ${mode} flex items-center gap-2 px-4 sm:px-5`} style={fill}>
+                      <I className="size-4" />
+                      <span>{label}</span>
+                    </span>
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </Reveal>
       <Reveal className="mx-auto mt-8 max-w-6xl">
@@ -436,7 +454,7 @@ export function Showcase() {
                       const lit = on && i === ptIdx;
                       return (
                         <motion.li key={label} initial={false} animate={on ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }} transition={{ delay: on ? 0.2 + i * 0.07 : 0 }} className={`relative flex items-center gap-2.5 rounded-xl px-2 py-1.5 text-sm font-medium transition-colors duration-300 ${lit ? "text-ink" : "text-ink-2"}`}>
-                          {lit && <motion.span layoutId={`pt-${tb.id}`} className="absolute inset-0 rounded-xl bg-white shadow-[0_8px_20px_-12px_rgba(0,71,171,0.45)] ring-1 ring-cobalt/10" transition={{ type: "spring", stiffness: 380, damping: 32 }} />}
+                          {lit && <motion.span layoutId={`pt-${tb.id}`} className="absolute inset-0 rounded-xl bg-surface shadow-[0_8px_20px_-12px_rgba(0,71,171,0.45)] ring-1 ring-cobalt/10" transition={{ type: "spring", stiffness: 380, damping: 32 }} />}
                           <motion.span className={`relative grid size-5 shrink-0 place-items-center rounded-full transition-colors duration-300 ${lit ? "bg-mint text-white" : "bg-mint/15 text-mint"}`} animate={{ scale: lit ? [1, 1.25, 1] : 1 }} transition={{ duration: 0.45 }}>
                             <Check className="size-3" strokeWidth={3} />
                           </motion.span>
@@ -449,11 +467,11 @@ export function Showcase() {
               );
             })}
           </div>
-          <div className="rounded-[24px] bg-gradient-to-br from-[#eef3ff] via-white to-[#f3efff] p-2.5 sm:p-3">
+          <div className="rounded-[24px] bg-gradient-to-br from-[var(--mock-a)] via-surface to-[var(--mock-b)] p-2.5 sm:p-3">
             {/* app window mockup: title bar with address, icon rail, the live view */}
             <FitScale min={640}>
-              <div className="overflow-hidden rounded-[18px] bg-[#f4f7fd] shadow-[0_24px_60px_-28px_rgba(16,40,110,0.45)] ring-1 ring-line">
-                <div className="flex items-center gap-3 border-b border-line bg-white px-4 py-2.5">
+              <div className="overflow-hidden rounded-[18px] bg-[var(--mock-a)] shadow-[0_24px_60px_-28px_rgba(16,40,110,0.45)] ring-1 ring-line">
+                <div className="flex items-center gap-3 border-b border-line bg-surface px-4 py-2.5">
                   <span className="flex gap-1.5" aria-hidden>
                     <span className="size-2.5 rounded-full bg-[#ff5f57]" />
                     <span className="size-2.5 rounded-full bg-[#febc2e]" />
@@ -473,7 +491,7 @@ export function Showcase() {
                   <span className="grid size-6 place-items-center rounded-full bg-cobalt text-[0.55rem] font-bold text-white">LK</span>
                 </div>
                 <div className="flex">
-                  <nav aria-hidden className="flex w-12 shrink-0 flex-col items-center gap-1.5 border-r border-line bg-white py-3">
+                  <nav aria-hidden className="flex w-12 shrink-0 flex-col items-center gap-1.5 border-r border-line bg-surface py-3">
                     <span className="mb-2 grid size-7 place-items-center rounded-lg bg-cobalt text-[0.7rem] font-extrabold text-white">P</span>
                     {RAIL.map(({ id, icon: I }) => (
                       <span key={id} className={`relative grid size-8 place-items-center rounded-lg ${id === tab ? "text-cobalt" : "text-ink-3"}`}>

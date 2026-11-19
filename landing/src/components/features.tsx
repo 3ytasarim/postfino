@@ -15,7 +15,7 @@ const track = (e: PointerEvent<HTMLElement>) => {
 function Card({ icon, title, text, className = "", children, delay = 0, plan }: { icon: ReactNode; title: string; text: string; className?: string; children?: ReactNode; delay?: number; plan?: string }) {
   return (
     <Reveal delay={delay} className={className}>
-      <article onPointerMove={track} className="spot group flex h-full flex-col overflow-hidden rounded-[28px] bg-white p-6 shadow-[0_20px_50px_-30px_rgba(16,40,110,0.35)] ring-1 ring-line transition-transform duration-500 hover:-translate-y-1">
+      <article onPointerMove={track} className="spot group flex h-full flex-col overflow-hidden rounded-[28px] bg-surface p-6 shadow-[0_20px_50px_-30px_rgba(16,40,110,0.35)] ring-1 ring-line transition-transform duration-500 hover:-translate-y-1">
         <div className="flex items-center justify-between">
           <span className="grid size-11 place-items-center rounded-2xl bg-cobalt/[0.08] text-cobalt-2 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[-6deg]">{icon}</span>
           {plan && <span className="rounded-full bg-paper px-2.5 py-1 text-[0.7rem] font-semibold text-ink-3 ring-1 ring-line">{plan}</span>}
@@ -44,29 +44,29 @@ function MiniCalendar() {
   const day = t % WEEK.length;
   const cur = WEEK[day];
   return (
-    <div className="rounded-[22px] bg-gradient-to-br from-[#eef3ff] via-white to-[#f3efff] p-3 ring-1 ring-line" aria-hidden>
-      <div className="grid grid-cols-7 gap-1 rounded-2xl bg-white/80 p-1 ring-1 ring-line">
+    <div className="rounded-[22px] bg-gradient-to-br from-[var(--mock-a)] via-surface to-[var(--mock-b)] p-3 ring-1 ring-line" aria-hidden>
+      <div className="grid grid-cols-7 gap-1 rounded-2xl bg-surface/80 p-1 ring-1 ring-line">
         {WEEK.map((w, i) => (
           <div key={w.d} className="relative flex flex-col items-center rounded-xl py-2">
-            {i === day && <motion.span layoutId="week-pill" className="absolute inset-0 rounded-xl bg-ink shadow-[0_10px_24px_-10px_rgba(11,16,32,0.7)]" transition={{ type: "spring", stiffness: 380, damping: 32 }} />}
-            <span className={`relative text-[0.65rem] font-bold tracking-wide uppercase transition-colors ${i === day ? "text-white/60" : "text-ink-3"}`}>{w.d}</span>
-            <span className={`relative font-display text-base font-bold transition-colors ${i === day ? "text-white" : "text-ink"}`}>{w.n}</span>
+            {i === day && <motion.span layoutId="week-pill" className="absolute inset-0 rounded-xl bg-contrast shadow-[0_10px_24px_-10px_rgba(11,16,32,0.7)]" transition={{ type: "spring", stiffness: 380, damping: 32 }} />}
+            <span className={`relative text-[0.65rem] font-bold tracking-wide uppercase transition-colors ${i === day ? "text-on-contrast/60" : "text-ink-3"}`}>{w.d}</span>
+            <span className={`relative font-display text-base font-bold transition-colors ${i === day ? "text-on-contrast" : "text-ink"}`}>{w.n}</span>
             <span className="relative mt-1 flex h-1.5 gap-0.5">
               {w.posts.map((p, k) => (
-                <span key={k} className="size-1.5 rounded-full" style={{ background: i === day ? "#fff" : networkColor(p[0]) }} />
+                <span key={k} className="size-1.5 rounded-full" style={{ background: i === day ? "var(--color-on-contrast)" : networkColor(p[0]) }} />
               ))}
             </span>
           </div>
         ))}
       </div>
-      <div className="relative mt-3 h-[124px] overflow-hidden">
+      <div className="strip-fade relative mt-2 -mx-2 h-[140px] overflow-hidden">
         <AnimatePresence mode="popLayout" initial={false}>
-          <motion.div key={day} className="absolute inset-0 flex gap-2.5" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -60, opacity: 0 }} transition={{ type: "spring", stiffness: 260, damping: 28 }}>
+          <motion.div key={day} className="absolute inset-x-2 top-1.5 bottom-3 flex gap-2.5" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -60, opacity: 0 }} transition={{ type: "spring", stiffness: 260, damping: 28 }}>
             {cur.posts.length === 0 ? (
               <div className="grid flex-1 place-items-center rounded-2xl border-2 border-dashed border-line text-sm font-semibold text-ink-3">+ Lücke füllen</div>
             ) : (
               cur.posts.map(([p, time, text, tone], k) => (
-                <motion.div key={text} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.08 + k * 0.08, type: "spring", stiffness: 300, damping: 24 }} className="flex min-w-0 max-w-[190px] flex-1 flex-col rounded-2xl bg-white p-2 shadow-[0_12px_28px_-16px_rgba(16,40,110,0.5)] ring-1 ring-line">
+                <motion.div key={text} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.08 + k * 0.08, type: "spring", stiffness: 300, damping: 24 }} className="flex min-w-0 max-w-[190px] flex-1 flex-col rounded-2xl bg-surface p-2 shadow-[0_12px_28px_-16px_rgba(16,40,110,0.5)] ring-1 ring-line">
                   <span className={`relative block h-14 rounded-xl bg-gradient-to-br ${tone}`}>
                     <span className="absolute top-1.5 left-1.5">
                       <NetworkIcon platform={p} badge size={20} />
@@ -108,7 +108,7 @@ function MiniChart() {
       </defs>
       <motion.path initial={false} d={`${d} L300,84 L0,84 Z`} animate={{ d: `${d} L300,84 L0,84 Z` }} transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }} fill="url(#fc)" />
       <motion.path key={t} d={d} fill="none" stroke="#1d5bd8" strokeWidth="2.5" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }} />
-      <motion.circle initial={false} cx={296} cy={80 - pts[pts.length - 1]} r="5" fill="#1d5bd8" stroke="#fff" strokeWidth="2.5" animate={{ cx: 300 - 4, cy: 80 - pts[pts.length - 1] }} transition={{ duration: 1.2 }} />
+      <motion.circle initial={false} cx={296} cy={80 - pts[pts.length - 1]} r="5" fill="#1d5bd8" stroke="var(--color-surface)" strokeWidth="2.5" animate={{ cx: 300 - 4, cy: 80 - pts[pts.length - 1] }} transition={{ duration: 1.2 }} />
     </svg>
   );
 }

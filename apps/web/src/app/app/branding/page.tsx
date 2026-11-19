@@ -5,6 +5,7 @@ import { FormAction } from "@/components/form-action";
 import { getMessages } from "@/i18n";
 import { requireContext } from "@/lib/server";
 import { brandingAction, domainAction, verifyDomainAction } from "../actions-billing";
+import { MadeBy } from "@/components/made-by";
 
 export const metadata = { title: "White-Label" };
 
@@ -117,7 +118,7 @@ export default async function BrandingPage() {
               <span className="inline-flex min-h-[40px] items-center rounded-[10px] px-4 font-semibold text-white" style={{ background: accent }}>
                 {t.review.approve}
               </span>
-              {!b.hidePoweredBy && <p className="text-xs text-ink-3">Postfino — {t.brand.by}</p>}
+              {!b.hidePoweredBy && <MadeBy pre={t.brand.madeByPre} suf={t.brand.madeBySuf} />}
             </div>
           </div>
         </aside>
