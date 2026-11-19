@@ -1,6 +1,6 @@
 // Legal texts v2 ("Fassung zur Freigabe", 18.11.2026): Impressum, Datenschutz, AGB incl. Widerruf, Sicherheit.
-// Switched on with LEGAL_TEXTS_V2=1 at build time. Off = the previous pages stay live, /agb and /sicherheit return 404.
-export const LEGAL_V2 = process.env.LEGAL_TEXTS_V2 === "1";
+// Live by default; LEGAL_TEXTS_V2=0 at build time switches back to the previous pages (/agb and /sicherheit then return 404).
+export const LEGAL_V2 = process.env.LEGAL_TEXTS_V2 !== "0";
 
 export const LEGAL_STAND = "18. November 2026";
 
